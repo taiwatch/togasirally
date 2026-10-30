@@ -25,13 +25,14 @@
       --primary: #2563eb;
       --primary-dark: #1d4ed8;
       --primary-light: #eff6ff;
+      --success: #10b981;
+      --success-light: #ecfdf5;
       --bg: #f8fafc;
       --surface: #ffffff;
       --text-main: #0f172a;
       --text-sub: #64748b;
       --border: #e2e8f0;
       --danger: #ef4444;
-      --danger-dark: #dc2626;
       --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
       --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
       --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
@@ -54,9 +55,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* =========================
-       ヘッダー (グラスモーフィズム)
-       ========================= */
+    /* ヘッダー (グラスモーフィズム) */
     header {
       position: sticky;
       top: 0;
@@ -77,18 +76,14 @@
       color: var(--text-main);
     }
 
-    /* =========================
-       メインエリア
-       ========================= */
+    /* メインエリア */
     main {
       max-width: 540px;
       margin: 0 auto;
       padding: 20px 16px calc(84px + env(safe-area-inset-bottom, 24px));
     }
 
-    /* =========================
-       画面切り替え
-       ========================= */
+    /* 画面切り替え */
     .screen {
       display: none;
       opacity: 0;
@@ -102,9 +97,7 @@
       transform: translateY(0);
     }
 
-    /* =========================
-       カードデザイン
-       ========================= */
+    /* カード */
     .card {
       background: var(--surface);
       border-radius: var(--radius-lg);
@@ -130,9 +123,54 @@
       margin-bottom: 20px;
     }
 
-    /* =========================
-       ポイント表示
-       ========================= */
+    /* プログレスバー（進捗状況） */
+    .progress-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+    }
+
+    .progress-title {
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .progress-ratio {
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      background: #e2e8f0;
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary) 0%, #3b82f6 100%);
+      border-radius: var(--radius-full);
+      transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .progress-fill.completed {
+      background: linear-gradient(90deg, var(--success) 0%, #34d399 100%);
+    }
+
+    /* ポイント表示ボックス */
     .points-box {
       background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
       border: 1px solid #bfdbfe;
@@ -166,9 +204,7 @@
       margin-left: 4px;
     }
 
-    /* =========================
-       ボタン共通
-       ========================= */
+    /* ボタン共通 */
     button {
       font-family: inherit;
       outline: none;
@@ -246,9 +282,7 @@
       margin-bottom: 16px;
     }
 
-    /* =========================
-       カメラ・リーダー
-       ========================= */
+    /* カメラ・リーダー */
     #reader {
       width: 100%;
       border-radius: var(--radius-md);
@@ -267,15 +301,46 @@
       text-align: center;
     }
 
-    /* =========================
-       地図
-       ========================= */
+    /* 地図 */
     #map {
       width: 100%;
       height: 380px;
       border-radius: var(--radius-md);
       margin-top: 12px;
       border: 1px solid var(--border);
+    }
+
+    /* Leaflet カスタムピン */
+    .map-pin {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 13px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+      border: 2px solid white;
+      transition: all 0.2s ease;
+    }
+
+    .map-pin.unvisited {
+      background: var(--primary);
+    }
+
+    .map-pin.visited {
+      background: var(--success);
+    }
+
+    .user-pin {
+      width: 16px;
+      height: 16px;
+      background: #3b82f6;
+      border-radius: 50%;
+      border: 3px solid white;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.35);
     }
 
     .spot-list {
@@ -287,6 +352,7 @@
     .spot-item {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       padding: 10px 12px;
       background: var(--bg);
       border-radius: var(--radius-sm);
@@ -295,19 +361,43 @@
       font-weight: 500;
     }
 
-    .spot-item::before {
+    .spot-item-name {
+      display: flex;
+      align-items: center;
+    }
+
+    .spot-item-name::before {
       content: "";
       display: inline-block;
-      width: 6px;
-      height: 6px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       background-color: var(--primary);
       margin-right: 10px;
     }
 
-    /* =========================
-       景品カード
-       ========================= */
+    .spot-item.visited .spot-item-name::before {
+      background-color: var(--success);
+    }
+
+    .badge-status {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+    }
+
+    .badge-status.visited {
+      background: var(--success-light);
+      color: #065f46;
+    }
+
+    .badge-status.unvisited {
+      background: #f1f5f9;
+      color: var(--text-sub);
+    }
+
+    /* 景品カード */
     .reward-card {
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
@@ -371,9 +461,7 @@
       border-bottom: none;
     }
 
-    /* =========================
-       下部ナビゲーション
-       ========================= */
+    /* 下部ナビゲーション */
     nav {
       position: fixed;
       bottom: 0;
@@ -433,6 +521,83 @@
     .nav-btn.selected .label {
       font-weight: 700;
     }
+
+    /* モーダルポップアップ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-card {
+      background: var(--surface);
+      width: 100%;
+      max-width: 340px;
+      border-radius: var(--radius-lg);
+      padding: 28px 24px 20px;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      transform: scale(0.92);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-spot {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 0 0 16px;
+    }
+
+    .modal-earned {
+      font-size: 2.75rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .modal-earned-sub {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin-bottom: 20px;
+    }
+
+    .modal-total {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      background: var(--bg);
+      padding: 10px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 
@@ -447,7 +612,18 @@
     <section id="home" class="screen active">
       <div class="card">
         <h2>ホーム</h2>
-        <p class="desc">二次元バーコードを読み取ってスポットを巡り、ポイントを集めましょう。</p>
+        <p class="desc">二次元バーコードを読み取ってスポットを巡り、ポイントを集めましょう。[cite: 1]</p>
+
+        <!-- プログレスバー -->
+        <div class="progress-card">
+          <div class="progress-header">
+            <span class="progress-title">巡回達成度</span>
+            <span class="progress-ratio" id="progressRatio">0 / 8 箇所 (0%)</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
 
         <div class="points-box">
           <div class="points-label">Current Points</div>
@@ -467,7 +643,7 @@
     <section id="scan" class="screen">
       <div class="card">
         <h2>スキャン</h2>
-        <p class="desc">カメラを起動してスポットの二次元バーコードを映してください。</p>
+        <p class="desc">カメラを起動してスポットの二次元バーコードを映してください。[cite: 1]</p>
 
         <div class="btn-group">
           <button id="backCameraBtn" class="btn-outline" style="margin: 0;">外カメラ</button>
@@ -479,7 +655,7 @@
         <button id="startBtn" class="btn-primary">カメラを起動</button>
         <button id="stopBtn" class="btn-outline" disabled>カメラを停止</button>
 
-        <p id="cameraMessage" class="message">カメラは停止中です。</p>
+        <p id="cameraMessage" class="message">カメラは停止中です。[cite: 1]</p>
 
         <div class="points-box" style="padding: 12px; margin-bottom: 0;">
           <div class="points-label">現在のポイント</div>
@@ -493,9 +669,9 @@
     <section id="mapScreen" class="screen">
       <div class="card">
         <h2>スポットマップ</h2>
-        <p class="desc">富樫氏ゆかりの史跡や文化施設を確認できます。</p>
+        <p class="desc">青は未訪問、緑は訪問済みのスポットです。</p>
 
-        <p id="locationMessage" class="message">現在地を取得しています...</p>
+        <p id="locationMessage" class="message">現在地を取得しています...[cite: 1]</p>
 
         <div id="map"></div>
 
@@ -505,14 +681,7 @@
 
         <div class="spot-list">
           <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-sub); margin-bottom: 8px;">スポット一覧</div>
-          <div class="spot-item">富樫館跡</div>
-          <div class="spot-item">守護所・富樫館跡</div>
-          <div class="spot-item">布市神社</div>
-          <div class="spot-item">大乗寺跡</div>
-          <div class="spot-item">野々市市郷土資料館・ふるさと歴史館</div>
-          <div class="spot-item">高尾城跡</div>
-          <div class="spot-item">伝燈寺</div>
-          <div class="spot-item">御廟谷</div>
+          <div id="spotListContainer"></div>
         </div>
       </div>
     </section>
@@ -521,7 +690,7 @@
     <section id="points" class="screen">
       <div class="card">
         <h2>ポイント確認</h2>
-        <p class="desc">スポットを回ってポイントを貯めましょう。</p>
+        <p class="desc">スポットを回ってポイントを貯めましょう。[cite: 1]</p>
 
         <div class="points-box">
           <div class="points-label">Total Points</div>
@@ -530,7 +699,7 @@
         </div>
 
         <div style="background: var(--bg); padding: 14px; border-radius: var(--radius-sm); font-size: 0.85rem; color: var(--text-sub); margin-bottom: 16px; line-height: 1.5;">
-          有効な二次元バーコードを読み取ると、1か所につき3〜5ポイント獲得できます。
+          有効な二次元バーコードを読み取ると、1か所につき3〜5ポイント獲得できます。[cite: 1]
         </div>
 
         <button id="pointsScanButton" class="btn-primary">二次元バーコードを読み取る</button>
@@ -542,7 +711,7 @@
     <section id="rewards" class="screen">
       <div class="card">
         <h2>景品交換</h2>
-        <p class="desc">貯めたポイントをお好きな景品と交換できます。</p>
+        <p class="desc">貯めたポイントをお好きな景品と交換できます。[cite: 1]</p>
 
         <div class="points-box" style="padding: 14px;">
           <div class="points-label">所持ポイント</div>
@@ -584,7 +753,19 @@
     </section>
   </main>
 
-  <!-- 下部固定メニュー（SVGアイコン＋ラベル） -->
+  <!-- ポイント獲得モーダルポップアップ -->
+  <div id="pointModal" class="modal-overlay">
+    <div class="modal-card">
+      <div id="modalSpotName" class="modal-spot">スポット来訪</div>
+      <h3 class="modal-title">ポイント獲得</h3>
+      <div id="modalEarnedPoints" class="modal-earned">+0</div>
+      <div class="modal-earned-sub">POINTS</div>
+      <div class="modal-total">現在の合計：<strong id="modalTotalPoints">0</strong> pt</div>
+      <button id="modalCloseBtn" class="btn-primary" style="margin-bottom: 0;">閉じる</button>
+    </div>
+  </div>
+
+  <!-- 下部固定メニュー -->
   <nav>
     <button id="navHome" class="nav-btn selected">
       <svg viewBox="0 0 24 24">
@@ -638,72 +819,17 @@
     let exchangeHistory = JSON.parse(localStorage.getItem('exchangeHistory') || '[]');
     let map = null;
     let userMarker = null;
+    let mapMarkers = [];
 
     const spotsData = [
-      {
-        id: 1,
-        name: '富樫館跡',
-        lat: 36.5309,
-        lng: 136.6268,
-        address: '野々市市本町2丁目付近',
-        description: '富樫氏歴代の居館跡と伝えられる場所です。富樫氏の歴史を知ることができる場所の一つです。'
-      },
-      {
-        id: 2,
-        name: '守護所・富樫館跡',
-        lat: 36.5359,
-        lng: 136.6276,
-        address: '野々市市住吉町235番地2',
-        description: '1335年に加賀の守護となった富樫高家の館で、政務を行った守護所でもあります。発掘調査によって館を囲む堀の一部が確認されています。'
-      },
-      {
-        id: 3,
-        name: '布市神社',
-        lat: 36.5333,
-        lng: 136.6257,
-        address: '野々市市本町2丁目付近',
-        description: '富樫氏と関わりのある神社です。富樫氏ゆかりの場所として知られています。'
-      },
-      {
-        id: 4,
-        name: '大乗寺跡',
-        lat: 36.5320,
-        lng: 136.6170,
-        address: '野々市市本町1丁目付近',
-        description: '富樫氏と深い関係を持った大乗寺の旧跡です。大乗寺は野々市で発展した後、各地を経て現在の金沢市へ移りました。'
-      },
-      {
-        id: 5,
-        name: '野々市市郷土資料館・ふるさと歴史館',
-        lat: 36.5348,
-        lng: 136.6149,
-        address: '郷土資料館：野々市市本町3丁目19番24号 / ふるさと歴史館：野々市市御経塚1丁目182番地',
-        description: '野々市市の歴史や文化財を学べる施設です。地域の歴史資料や出土品などを見ることができます。'
-      },
-      {
-        id: 6,
-        name: '高尾城跡',
-        lat: 36.514261,
-        lng: 136.636648,
-        address: '石川県金沢市高尾町',
-        description: '富樫氏の詰城とされる山城跡です。富樫政親が一向一揆との戦いの際に立て籠もった場所として知られています。'
-      },
-      {
-        id: 7,
-        name: '伝燈寺',
-        lat: 36.56752,
-        lng: 136.7155,
-        address: '石川県金沢市伝燈寺町付近',
-        description: '富樫氏と関わりのある寺院です。富樫氏ゆかりの歴史を伝える場所の一つです。'
-      },
-      {
-        id: 8,
-        name: '御廟谷',
-        lat: 36.504557,
-        lng: 136.627999,
-        address: '石川県金沢市額谷町付近',
-        description: '富樫氏の墓所と伝えられる場所です。富樫氏の歴史を知ることができる場所の一つです。'
-      }
+      { id: 1, name: '富樫館跡', lat: 36.5309, lng: 136.6268, address: '野々市市本町2丁目付近', description: '富樫氏歴代の居館跡と伝えられる場所です。富樫氏の歴史を知ることができる場所の一つです。' },
+      { id: 2, name: '守護所・富樫館跡', lat: 36.5359, lng: 136.6276, address: '野々市市住吉町235番地2', description: '1335年に加賀の守護となった富樫高家の館で、政務を行った守護所でもあります。発掘調査によって館を囲む堀の一部が確認されています。' },
+      { id: 3, name: '布市神社', lat: 36.5333, lng: 136.6257, address: '野々市市本町2丁目付近', description: '富樫氏と関わりのある神社です。富樫氏ゆかりの場所として知られています。' },
+      { id: 4, name: '大乗寺跡', lat: 36.5320, lng: 136.6170, address: '野々市市本町1丁目付近', description: '富樫氏と深い関係を持った大乗寺の旧跡です。大乗寺は野々市で発展した後、各地を経て現在の金沢市へ移りました。' },
+      { id: 5, name: '野々市市郷土資料館・ふるさと歴史館', lat: 36.5348, lng: 136.6149, address: '郷土資料館：野々市市本町3丁目19番24号 / ふるさと歴史館：野々市市御経塚1丁目182番地', description: '野々市市の歴史や文化財を学べる施設です。地域の歴史資料や出土品などを見ることができます。' },
+      { id: 6, name: '高尾城跡', lat: 36.514261, lng: 136.636648, address: '石川県金沢市高尾町', description: '富樫氏の詰城とされる山城跡です。富樫政親が一向一揆との戦いの際に立て籠もった場所として知られています。' },
+      { id: 7, name: '伝燈寺', lat: 36.56752, lng: 136.7155, address: '石川県金沢市伝燈寺町付近', description: '富樫氏と関わりのある寺院です。富樫氏ゆかりの歴史を伝える場所の一つです。' },
+      { id: 8, name: '御廟谷', lat: 36.504557, lng: 136.627999, address: '石川県金沢市額谷町付近', description: '富樫氏の墓所と伝えられる場所です。富樫氏の歴史を知ることができる場所の一つです。' }
     ];
 
     function updatePoints() {
@@ -711,6 +837,27 @@
       document.getElementById('scanPoints').textContent = points;
       document.getElementById('totalPoints').textContent = points;
       document.getElementById('rewardPoints').textContent = points;
+
+      // 巡回プログレスバーの更新
+      const totalCount = spotsData.length;
+      const visitedCount = scannedCodes.size;
+      const percentage = Math.round((visitedCount / totalCount) * 100);
+
+      const ratioEl = document.getElementById('progressRatio');
+      const fillEl = document.getElementById('progressFill');
+
+      ratioEl.textContent = `${visitedCount} / ${totalCount} 箇所 (${percentage}%)`;
+      fillEl.style.width = `${percentage}%`;
+
+      if (percentage === 100) {
+        fillEl.classList.add('completed');
+        ratioEl.textContent = '制覇完了！ (100%)';
+      } else {
+        fillEl.classList.remove('completed');
+      }
+
+      // スポット一覧の表示更新
+      updateSpotListUI();
     }
 
     function showScreen(screenName) {
@@ -744,7 +891,10 @@
       if (screenName === 'mapScreen') {
         setTimeout(() => {
           initializeMap();
-          if (map) map.invalidateSize();
+          if (map) {
+            map.invalidateSize();
+            refreshMapPins();
+          }
         }, 120);
       }
 
@@ -770,26 +920,45 @@
     document.getElementById('pointsScanButton').addEventListener('click', () => showScreen('scan'));
     document.getElementById('pointsRewardButton').addEventListener('click', () => showScreen('rewards'));
 
+    // モーダル表示
+    function openPointModal(spotName, earnedPoints, totalPoints) {
+      document.getElementById('modalSpotName').textContent = spotName;
+      document.getElementById('modalEarnedPoints').textContent = `+${earnedPoints}`;
+      document.getElementById('modalTotalPoints').textContent = totalPoints;
+      document.getElementById('pointModal').classList.add('active');
+    }
+
+    function closePointModal() {
+      document.getElementById('pointModal').classList.remove('active');
+    }
+
+    document.getElementById('modalCloseBtn').addEventListener('click', closePointModal);
+    document.getElementById('pointModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('pointModal')) {
+        closePointModal();
+      }
+    });
+
     // カメラ
     async function startCamera() {
       if (cameraBusy || cameraRunning) return;
 
       if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-        document.getElementById('cameraMessage').textContent = 'カメラを使用するにはHTTPS環境で開いてください。';
+        document.getElementById('cameraMessage').textContent = 'カメラを使用するにはHTTPS環境で開いてください。[cite: 1]';
         return;
       }
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        document.getElementById('cameraMessage').textContent = 'カメラを利用できません。HTTPS通信とカメラの許可を確認してください。';
+        document.getElementById('cameraMessage').textContent = 'カメラを利用できません。HTTPS通信とカメラの許可を確認してください。[cite: 1]';
         return;
       }
       if (typeof Html5Qrcode === 'undefined') {
-        document.getElementById('cameraMessage').textContent = 'ライブラリの読み込みに失敗しました。通信環境を確認してください。';
+        document.getElementById('cameraMessage').textContent = 'ライブラリの読み込みに失敗しました。通信環境を確認してください。[cite: 1]';
         return;
       }
 
       cameraBusy = true;
       document.getElementById('startBtn').disabled = true;
-      document.getElementById('cameraMessage').textContent = 'カメラを起動しています...';
+      document.getElementById('cameraMessage').textContent = 'カメラを起動しています...[cite: 1]';
 
       try {
         if (!scanner) {
@@ -804,10 +973,10 @@
         cameraRunning = true;
         document.getElementById('stopBtn').disabled = false;
         document.getElementById('cameraMessage').textContent =
-          currentCamera === 'environment' ? '外カメラで読み取り中です。' : '内カメラで読み取り中です。';
+          currentCamera === 'environment' ? '外カメラで読み取り中です。[cite: 1]' : '内カメラで読み取り中です。[cite: 1]';
       } catch (error) {
         console.error(error);
-        document.getElementById('cameraMessage').textContent = 'カメラを起動できません。設定から許可を確認してください。';
+        document.getElementById('cameraMessage').textContent = 'カメラを起動できません。設定から許可を確認してください。[cite: 1]';
       }
       cameraBusy = false;
       document.getElementById('startBtn').disabled = cameraRunning;
@@ -821,7 +990,7 @@
       try {
         await scanner.stop();
         cameraRunning = false;
-        document.getElementById('cameraMessage').textContent = 'カメラは停止中です。';
+        document.getElementById('cameraMessage').textContent = 'カメラは停止中です。[cite: 1]';
       } catch (error) {
         console.error(error);
       }
@@ -839,7 +1008,7 @@
       document.getElementById('backCameraBtn').disabled = (mode === 'environment');
       document.getElementById('frontCameraBtn').disabled = (mode === 'user');
       document.getElementById('cameraMessage').textContent =
-        mode === 'environment' ? '外カメラを選択しました。' : '内カメラを選択しました。';
+        mode === 'environment' ? '外カメラを選択しました。[cite: 1]' : '内カメラを選択しました。[cite: 1]';
 
       if (wasRunning) await startCamera();
     }
@@ -856,15 +1025,20 @@
       const code = decodedText.trim();
 
       if (!validCodes.includes(code)) {
-        document.getElementById('cameraMessage').textContent = 'その二次元バーコードは使用できません。';
+        document.getElementById('cameraMessage').textContent = 'その二次元バーコードは使用できません。[cite: 1]';
         scanProcessing = false;
         return;
       }
 
       if (scannedCodes.has(code)) {
-        document.getElementById('cameraMessage').textContent = 'その二次元バーコードは既に使用済みです。';
+        document.getElementById('cameraMessage').textContent = 'その二次元バーコードは既に使用済みです。[cite: 1]';
         scanProcessing = false;
         return;
+      }
+
+      // 触覚フィードバック（バイブレーション: 短く2回）
+      if (navigator.vibrate) {
+        navigator.vibrate([100, 50, 150]);
       }
 
       scannedCodes.add(code);
@@ -877,6 +1051,16 @@
       updatePoints();
       document.getElementById('cameraMessage').textContent = `${code} を認識しました。${earnedPoints}pt 獲得！`;
 
+      const spotId = parseInt(code.replace('togashi', ''), 10);
+      const spot = spotsData.find(s => s.id === spotId);
+      const spotName = spot ? spot.name : code;
+
+      openPointModal(spotName, earnedPoints, points);
+
+      if (map) {
+        refreshMapPins();
+      }
+
       setTimeout(() => {
         scanProcessing = false;
       }, 1000);
@@ -888,6 +1072,11 @@
       if (points < requiredPoints) {
         message.textContent = 'ポイントが不足しています。';
         return;
+      }
+
+      // 交換成功時にも短いバイブレーション
+      if (navigator.vibrate) {
+        navigator.vibrate(120);
       }
 
       points -= requiredPoints;
@@ -916,7 +1105,7 @@
 
       if (exchangeHistory.length === 0) {
         const li = document.createElement('li');
-        li.textContent = '交換履歴はまだありません。';
+        li.textContent = '交換履歴はまだありません。[cite: 1]';
         list.appendChild(li);
         return;
       }
@@ -929,11 +1118,66 @@
       }
     }
 
+    // スポット一覧リストUIの更新
+    function updateSpotListUI() {
+      const container = document.getElementById('spotListContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      spotsData.forEach(spot => {
+        const isVisited = scannedCodes.has(`togashi${spot.id}`);
+        const item = document.createElement('div');
+        item.className = `spot-item ${isVisited ? 'visited' : ''}`;
+        item.innerHTML = `
+          <div class="spot-item-name">${spot.name}</div>
+          <span class="badge-status ${isVisited ? 'visited' : 'unvisited'}">
+            ${isVisited ? '訪問済' : '未訪問'}
+          </span>
+        `;
+        container.appendChild(item);
+      });
+    }
+
     // 地図機能
+    function createPinIcon(spotId, isVisited) {
+      const pinClass = isVisited ? 'map-pin visited' : 'map-pin unvisited';
+      const label = isVisited ? '✓' : spotId;
+      return L.divIcon({
+        className: 'custom-pin-wrapper',
+        html: `<div class="${pinClass}">${label}</div>`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, -18]
+      });
+    }
+
+    function refreshMapPins() {
+      if (!map) return;
+
+      mapMarkers.forEach(({ marker, spot }) => {
+        const isVisited = scannedCodes.has(`togashi${spot.id}`);
+        marker.setIcon(createPinIcon(spot.id, isVisited));
+
+        const popupContent = `
+          <div style="min-width: 200px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+              <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700;">${spot.name}</h4>
+              <span style="font-size: 0.7rem; font-weight: 700; padding: 2px 6px; border-radius: 9999px; background: ${isVisited ? '#ecfdf5' : '#f1f5f9'}; color: ${isVisited ? '#065f46' : '#64748b'};">
+                ${isVisited ? '来訪済' : '未訪問'}
+              </span>
+            </div>
+            <p style="margin: 4px 0; font-size: 0.75rem; color: #64748b;"><strong>住所:</strong> ${spot.address}</p>
+            <p style="margin: 6px 0 0; font-size: 0.8rem; line-height: 1.5;">${spot.description}</p>
+          </div>
+        `;
+        marker.setPopupContent(popupContent);
+      });
+    }
+
     function initializeMap() {
       if (map) return;
       if (typeof L === 'undefined') {
-        document.getElementById('locationMessage').textContent = '地図機能を読み込めません。ネットワークを確認してください。';
+        document.getElementById('locationMessage').textContent = '地図機能を読み込めません。ネットワークを確認してください。[cite: 1]';
         return;
       }
 
@@ -942,16 +1186,18 @@
         attribution: '&copy; OpenStreetMap contributors'
       }).addTo(map);
 
+      mapMarkers = [];
+
       spotsData.forEach(spot => {
-        const popupContent = `
-          <div style="min-width: 200px;">
-            <h4 style="margin: 0 0 6px; font-size: 0.95rem; font-weight: 700;">${spot.name}</h4>
-            <p style="margin: 4px 0; font-size: 0.75rem; color: #64748b;"><strong>住所:</strong> ${spot.address}</p>
-            <p style="margin: 6px 0 0; font-size: 0.8rem; line-height: 1.5;">${spot.description}</p>
-          </div>
-        `;
-        L.marker([spot.lat, spot.lng]).addTo(map).bindPopup(popupContent);
+        const isVisited = scannedCodes.has(`togashi${spot.id}`);
+        const icon = createPinIcon(spot.id, isVisited);
+
+        const marker = L.marker([spot.lat, spot.lng], { icon: icon }).addTo(map);
+        marker.bindPopup('');
+        mapMarkers.push({ marker, spot });
       });
+
+      refreshMapPins();
 
       const spotBounds = spotsData.map(spot => [spot.lat, spot.lng]);
       map.fitBounds(spotBounds, { padding: [30, 30] });
@@ -973,10 +1219,17 @@
           const lng = position.coords.longitude;
           message.textContent = '現在地を取得しました。';
 
+          const userIcon = L.divIcon({
+            className: 'user-pin-wrapper',
+            html: '<div class="user-pin"></div>',
+            iconSize: [16, 16],
+            iconAnchor: [8, 8]
+          });
+
           if (userMarker) {
             userMarker.setLatLng([lat, lng]);
           } else {
-            userMarker = L.marker([lat, lng]).addTo(map).bindPopup('現在地');
+            userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(map).bindPopup('現在地');
           }
           map.setView([lat, lng], 15);
         },
@@ -1005,6 +1258,10 @@
 
       updatePoints();
       updateHistory();
+
+      if (map) {
+        refreshMapPins();
+      }
 
       document.getElementById('exchangeMessage').textContent = '';
       document.getElementById('cameraMessage').textContent = 'データを初期化しました。';
