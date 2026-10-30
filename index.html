@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="富樫デジタルスタンプラリー">
+  <meta name="theme-color" content="#2563eb">
+  <title>富樫デジタルスタンプラリー</title>
+
+  <!-- Google Fonts: Inter & Noto Sans JP -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- 二次元バーコード読み取り -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <!-- Leaflet 地図 -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light: #eff6ff;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text-main: #0f172a;
+      --text-sub: #64748b;
+      --border: #e2e8f0;
+      --danger: #ef4444;
+      --danger-dark: #dc2626;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-full: 9999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* =========================
+       ヘッダー (グラスモーフィズム)
+       ========================= */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+      padding: env(safe-area-inset-top, 16px) 20px 12px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text-main);
+    }
+
+    /* =========================
+       メインエリア
+       ========================= */
+    main {
+      max-width: 540px;
+      margin: 0 auto;
+      padding: 20px 16px calc(84px + env(safe-area-inset-bottom, 24px));
+    }
+
+    /* =========================
+       画面切り替え
+       ========================= */
+    .screen {
+      display: none;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .screen.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* =========================
+       カードデザイン
+       ========================= */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 24px 20px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .card p.desc {
+      color: var(--text-sub);
+      font-size: 0.875rem;
+      line-height: 1.6;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+
+    /* =========================
+       ポイント表示
+       ========================= */
+    .points-box {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius-md);
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .points-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #1e40af;
+      margin-bottom: 4px;
+    }
+
+    .points-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+      display: inline-block;
+    }
+
+    .points-unit {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-left: 4px;
+    }
+
+    /* =========================
+       ボタン共通
+       ========================= */
+    button {
+      font-family: inherit;
+      outline: none;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      transition: all 0.15s ease;
+      touch-action: manipulation;
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      padding: 14px 18px;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px 0 rgba(37, 99, 235, 0.2);
+      margin-bottom: 10px;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+      background: var(--primary-dark);
+    }
+
+    .btn-primary:disabled {
+      background: #cbd5e1;
+      color: #94a3b8;
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-outline {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 14px 18px;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 10px;
+    }
+
+    .btn-outline:active {
+      background: #f1f5f9;
+      transform: scale(0.98);
+    }
+
+    .btn-danger {
+      width: 100%;
+      background: transparent;
+      color: var(--danger);
+      border: 1px dashed var(--danger);
+      padding: 12px;
+      font-size: 0.85rem;
+      margin-top: 10px;
+    }
+
+    .btn-danger:active {
+      background: #fef2f2;
+    }
+
+    .btn-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    /* =========================
+       カメラ・リーダー
+       ========================= */
+    #reader {
+      width: 100%;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+      background: #000;
+    }
+
+    .message {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--primary);
+      min-height: 20px;
+      margin: 12px 0;
+      text-align: center;
+    }
+
+    /* =========================
+       地図
+       ========================= */
+    #map {
+      width: 100%;
+      height: 380px;
+      border-radius: var(--radius-md);
+      margin-top: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .spot-list {
+      margin-top: 16px;
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+    }
+
+    .spot-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 12px;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      margin-bottom: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .spot-item::before {
+      content: "";
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      margin-right: 10px;
+    }
+
+    /* =========================
+       景品カード
+       ========================= */
+    .reward-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 12px;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .reward-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .reward-header h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .reward-cost {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--primary);
+      background: var(--primary-light);
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      white-space: nowrap;
+    }
+
+    .history-card {
+      margin-top: 20px;
+      background: var(--bg);
+      border-radius: var(--radius-md);
+      padding: 14px;
+    }
+
+    .history-card h4 {
+      margin: 0 0 10px;
+      font-size: 0.9rem;
+      color: var(--text-sub);
+    }
+
+    .history-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--text-sub);
+    }
+
+    .history-list li {
+      padding: 6px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .history-list li:last-child {
+      border-bottom: none;
+    }
+
+    /* =========================
+       下部ナビゲーション
+       ========================= */
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 2000;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(226, 232, 240, 0.8);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.03);
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      padding: 4px 0 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      color: var(--text-sub);
+      border-radius: var(--radius-sm);
+      transition: color 0.15s ease;
+      min-height: 48px;
+    }
+
+    .nav-btn svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform 0.15s ease;
+    }
+
+    .nav-btn .label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .nav-btn:active svg {
+      transform: scale(0.9);
+    }
+
+    .nav-btn.selected {
+      color: var(--primary);
+    }
+
+    .nav-btn.selected .label {
+      font-weight: 700;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>富樫デジタルスタンプラリー</h1>
+  </header>
+
+  <main>
+    <!-- ホーム画面 -->
+    <section id="home" class="screen active">
+      <div class="card">
+        <h2>ホーム</h2>
+        <p class="desc">二次元バーコードを読み取ってスポットを巡り、ポイントを集めましょう。</p>
+
+        <div class="points-box">
+          <div class="points-label">Current Points</div>
+          <span class="points-value" id="homePoints">0</span>
+          <span class="points-unit">pt</span>
+        </div>
+
+        <button id="homeScanButton" class="btn-primary">二次元バーコードを読み取る</button>
+        <button id="homeMapButton" class="btn-outline">スポットマップを開く</button>
+        <button id="homeRewardsButton" class="btn-outline">景品と交換する</button>
+        <button id="togashiSiteButton" class="btn-outline">富樫プロジェクトについて</button>
+        <button id="resetButton" class="btn-danger">データを初期化</button>
+      </div>
+    </section>
+
+    <!-- 二次元バーコード読み取り画面 -->
+    <section id="scan" class="screen">
+      <div class="card">
+        <h2>スキャン</h2>
+        <p class="desc">カメラを起動してスポットの二次元バーコードを映してください。</p>
+
+        <div class="btn-group">
+          <button id="backCameraBtn" class="btn-outline" style="margin: 0;">外カメラ</button>
+          <button id="frontCameraBtn" class="btn-outline" style="margin: 0;">内カメラ</button>
+        </div>
+
+        <div id="reader"></div>
+
+        <button id="startBtn" class="btn-primary">カメラを起動</button>
+        <button id="stopBtn" class="btn-outline" disabled>カメラを停止</button>
+
+        <p id="cameraMessage" class="message">カメラは停止中です。</p>
+
+        <div class="points-box" style="padding: 12px; margin-bottom: 0;">
+          <div class="points-label">現在のポイント</div>
+          <span class="points-value" id="scanPoints" style="font-size: 1.6rem;">0</span>
+          <span class="points-unit">pt</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 地図画面 -->
+    <section id="mapScreen" class="screen">
+      <div class="card">
+        <h2>スポットマップ</h2>
+        <p class="desc">富樫氏ゆかりの史跡や文化施設を確認できます。</p>
+
+        <p id="locationMessage" class="message">現在地を取得しています...</p>
+
+        <div id="map"></div>
+
+        <button id="locationButton" class="btn-outline" style="margin-top: 14px;">
+          現在地を再取得
+        </button>
+
+        <div class="spot-list">
+          <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-sub); margin-bottom: 8px;">スポット一覧</div>
+          <div class="spot-item">富樫館跡</div>
+          <div class="spot-item">守護所・富樫館跡</div>
+          <div class="spot-item">布市神社</div>
+          <div class="spot-item">大乗寺跡</div>
+          <div class="spot-item">野々市市郷土資料館・ふるさと歴史館</div>
+          <div class="spot-item">高尾城跡</div>
+          <div class="spot-item">伝燈寺</div>
+          <div class="spot-item">御廟谷</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ポイント確認画面 -->
+    <section id="points" class="screen">
+      <div class="card">
+        <h2>ポイント確認</h2>
+        <p class="desc">スポットを回ってポイントを貯めましょう。</p>
+
+        <div class="points-box">
+          <div class="points-label">Total Points</div>
+          <span class="points-value" id="totalPoints">0</span>
+          <span class="points-unit">pt</span>
+        </div>
+
+        <div style="background: var(--bg); padding: 14px; border-radius: var(--radius-sm); font-size: 0.85rem; color: var(--text-sub); margin-bottom: 16px; line-height: 1.5;">
+          有効な二次元バーコードを読み取ると、1か所につき3〜5ポイント獲得できます。
+        </div>
+
+        <button id="pointsScanButton" class="btn-primary">二次元バーコードを読み取る</button>
+        <button id="pointsRewardButton" class="btn-outline">景品交換へ</button>
+      </div>
+    </section>
+
+    <!-- 景品交換画面 -->
+    <section id="rewards" class="screen">
+      <div class="card">
+        <h2>景品交換</h2>
+        <p class="desc">貯めたポイントをお好きな景品と交換できます。</p>
+
+        <div class="points-box" style="padding: 14px;">
+          <div class="points-label">所持ポイント</div>
+          <span class="points-value" id="rewardPoints" style="font-size: 1.8rem;">0</span>
+          <span class="points-unit">pt</span>
+        </div>
+
+        <div class="reward-card">
+          <div class="reward-header">
+            <h3>協力店で使用できる商品券</h3>
+            <span class="reward-cost">20 pt</span>
+          </div>
+          <button id="reward20Button" class="btn-primary" style="margin-bottom: 0; padding: 10px;">交換する</button>
+        </div>
+
+        <div class="reward-card">
+          <div class="reward-header">
+            <h3>オリジナルキーホルダー</h3>
+            <span class="reward-cost">15 pt</span>
+          </div>
+          <button id="reward15Button" class="btn-primary" style="margin-bottom: 0; padding: 10px;">交換する</button>
+        </div>
+
+        <div class="reward-card">
+          <div class="reward-header">
+            <h3>オリジナルステッカー</h3>
+            <span class="reward-cost">10 pt</span>
+          </div>
+          <button id="reward10Button" class="btn-primary" style="margin-bottom: 0; padding: 10px;">交換する</button>
+        </div>
+
+        <p id="exchangeMessage" class="message"></p>
+
+        <div class="history-card">
+          <h4>交換履歴</h4>
+          <ul id="historyList" class="history-list"></ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 下部固定メニュー（SVGアイコン＋ラベル） -->
+  <nav>
+    <button id="navHome" class="nav-btn selected">
+      <svg viewBox="0 0 24 24">
+        <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1V9.5z"/>
+      </svg>
+      <span class="label">ホーム</span>
+    </button>
+    <button id="navScan" class="nav-btn">
+      <svg viewBox="0 0 24 24">
+        <path d="M4 7V4h3M20 7V4h-3M4 17v3h3M20 17v3h-3M9 9h6v6H9z"/>
+      </svg>
+      <span class="label">スキャン</span>
+    </button>
+    <button id="navMap" class="nav-btn">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 21s-6-5.33-6-10a6 6 0 1 1 12 0c0 4.67-6 10-6 10z"/>
+        <circle cx="12" cy="11" r="2.5" fill="currentColor"/>
+      </svg>
+      <span class="label">マップ</span>
+    </button>
+    <button id="navPoints" class="nav-btn">
+      <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M12 7v10M9 9.5h6a1.5 1.5 0 0 1 0 3H9h6a1.5 1.5 0 0 1 0 3H9"/>
+      </svg>
+      <span class="label">ポイント</span>
+    </button>
+    <button id="navRewards" class="nav-btn">
+      <svg viewBox="0 0 24 24">
+        <rect x="3" y="8" width="18" height="13" rx="2"/>
+        <path d="M12 8v13M3 12h18M12 8a3 3 0 1 0-3-3c2 0 3 3 3 3zm0 0a3 3 0 1 1 3-3c-2 0-3 3-3 3z"/>
+      </svg>
+      <span class="label">景品</span>
+    </button>
+  </nav>
+
+  <script>
+    let points = Number(localStorage.getItem('points')) || 0;
+    let scannedCodes = new Set(JSON.parse(localStorage.getItem('scannedCodes') || '[]'));
+
+    const validCodes = [
+      'togashi1', 'togashi2', 'togashi3', 'togashi4',
+      'togashi5', 'togashi6', 'togashi7', 'togashi8'
+    ];
+
+    let scanner = null;
+    let cameraRunning = false;
+    let currentCamera = 'environment';
+    let cameraBusy = false;
+    let scanProcessing = false;
+    let exchangeHistory = JSON.parse(localStorage.getItem('exchangeHistory') || '[]');
+    let map = null;
+    let userMarker = null;
+
+    const spotsData = [
+      {
+        id: 1,
+        name: '富樫館跡',
+        lat: 36.5309,
+        lng: 136.6268,
+        address: '野々市市本町2丁目付近',
+        description: '富樫氏歴代の居館跡と伝えられる場所です。富樫氏の歴史を知ることができる場所の一つです。'
+      },
+      {
+        id: 2,
+        name: '守護所・富樫館跡',
+        lat: 36.5359,
+        lng: 136.6276,
+        address: '野々市市住吉町235番地2',
+        description: '1335年に加賀の守護となった富樫高家の館で、政務を行った守護所でもあります。発掘調査によって館を囲む堀の一部が確認されています。'
+      },
+      {
+        id: 3,
+        name: '布市神社',
+        lat: 36.5333,
+        lng: 136.6257,
+        address: '野々市市本町2丁目付近',
+        description: '富樫氏と関わりのある神社です。富樫氏ゆかりの場所として知られています。'
+      },
+      {
+        id: 4,
+        name: '大乗寺跡',
+        lat: 36.5320,
+        lng: 136.6170,
+        address: '野々市市本町1丁目付近',
+        description: '富樫氏と深い関係を持った大乗寺の旧跡です。大乗寺は野々市で発展した後、各地を経て現在の金沢市へ移りました。'
+      },
+      {
+        id: 5,
+        name: '野々市市郷土資料館・ふるさと歴史館',
+        lat: 36.5348,
+        lng: 136.6149,
+        address: '郷土資料館：野々市市本町3丁目19番24号 / ふるさと歴史館：野々市市御経塚1丁目182番地',
+        description: '野々市市の歴史や文化財を学べる施設です。地域の歴史資料や出土品などを見ることができます。'
+      },
+      {
+        id: 6,
+        name: '高尾城跡',
+        lat: 36.514261,
+        lng: 136.636648,
+        address: '石川県金沢市高尾町',
+        description: '富樫氏の詰城とされる山城跡です。富樫政親が一向一揆との戦いの際に立て籠もった場所として知られています。'
+      },
+      {
+        id: 7,
+        name: '伝燈寺',
+        lat: 36.56752,
+        lng: 136.7155,
+        address: '石川県金沢市伝燈寺町付近',
+        description: '富樫氏と関わりのある寺院です。富樫氏ゆかりの歴史を伝える場所の一つです。'
+      },
+      {
+        id: 8,
+        name: '御廟谷',
+        lat: 36.504557,
+        lng: 136.627999,
+        address: '石川県金沢市額谷町付近',
+        description: '富樫氏の墓所と伝えられる場所です。富樫氏の歴史を知ることができる場所の一つです。'
+      }
+    ];
+
+    function updatePoints() {
+      document.getElementById('homePoints').textContent = points;
+      document.getElementById('scanPoints').textContent = points;
+      document.getElementById('totalPoints').textContent = points;
+      document.getElementById('rewardPoints').textContent = points;
+    }
+
+    function showScreen(screenName) {
+      const screens = document.querySelectorAll('.screen');
+      screens.forEach(screen => screen.classList.remove('active'));
+
+      const target = document.getElementById(screenName);
+      if (!target) return;
+      target.classList.add('active');
+
+      const navButtons = document.querySelectorAll('nav button');
+      navButtons.forEach(button => button.classList.remove('selected'));
+
+      const navMap = {
+        home: 'navHome',
+        scan: 'navScan',
+        mapScreen: 'navMap',
+        points: 'navPoints',
+        rewards: 'navRewards'
+      };
+
+      const selectedButton = document.getElementById(navMap[screenName]);
+      if (selectedButton) {
+        selectedButton.classList.add('selected');
+      }
+
+      if (screenName !== 'scan' && cameraRunning) {
+        stopCamera();
+      }
+
+      if (screenName === 'mapScreen') {
+        setTimeout(() => {
+          initializeMap();
+          if (map) map.invalidateSize();
+        }, 120);
+      }
+
+      updatePoints();
+    }
+
+    // ナビゲーション
+    document.getElementById('navHome').addEventListener('click', () => showScreen('home'));
+    document.getElementById('navScan').addEventListener('click', () => showScreen('scan'));
+    document.getElementById('navMap').addEventListener('click', () => showScreen('mapScreen'));
+    document.getElementById('navPoints').addEventListener('click', () => showScreen('points'));
+    document.getElementById('navRewards').addEventListener('click', () => showScreen('rewards'));
+
+    // ホーム内リンク
+    document.getElementById('homeScanButton').addEventListener('click', () => showScreen('scan'));
+    document.getElementById('homeMapButton').addEventListener('click', () => showScreen('mapScreen'));
+    document.getElementById('homeRewardsButton').addEventListener('click', () => showScreen('rewards'));
+    document.getElementById('togashiSiteButton').addEventListener('click', () => {
+      window.open('https://www.city.nonoichi.lg.jp/', '_blank');
+    });
+
+    // ポイント内リンク
+    document.getElementById('pointsScanButton').addEventListener('click', () => showScreen('scan'));
+    document.getElementById('pointsRewardButton').addEventListener('click', () => showScreen('rewards'));
+
+    // カメラ
+    async function startCamera() {
+      if (cameraBusy || cameraRunning) return;
+
+      if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+        document.getElementById('cameraMessage').textContent = 'カメラを使用するにはHTTPS環境で開いてください。';
+        return;
+      }
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        document.getElementById('cameraMessage').textContent = 'カメラを利用できません。HTTPS通信とカメラの許可を確認してください。';
+        return;
+      }
+      if (typeof Html5Qrcode === 'undefined') {
+        document.getElementById('cameraMessage').textContent = 'ライブラリの読み込みに失敗しました。通信環境を確認してください。';
+        return;
+      }
+
+      cameraBusy = true;
+      document.getElementById('startBtn').disabled = true;
+      document.getElementById('cameraMessage').textContent = 'カメラを起動しています...';
+
+      try {
+        if (!scanner) {
+          scanner = new Html5Qrcode('reader');
+        }
+        await scanner.start(
+          { facingMode: currentCamera },
+          { fps: 10, qrbox: { width: 220, height: 220 } },
+          onScanSuccess,
+          () => {}
+        );
+        cameraRunning = true;
+        document.getElementById('stopBtn').disabled = false;
+        document.getElementById('cameraMessage').textContent =
+          currentCamera === 'environment' ? '外カメラで読み取り中です。' : '内カメラで読み取り中です。';
+      } catch (error) {
+        console.error(error);
+        document.getElementById('cameraMessage').textContent = 'カメラを起動できません。設定から許可を確認してください。';
+      }
+      cameraBusy = false;
+      document.getElementById('startBtn').disabled = cameraRunning;
+    }
+
+    async function stopCamera() {
+      if (!scanner || !cameraRunning || cameraBusy) return;
+      cameraBusy = true;
+      document.getElementById('stopBtn').disabled = true;
+
+      try {
+        await scanner.stop();
+        cameraRunning = false;
+        document.getElementById('cameraMessage').textContent = 'カメラは停止中です。';
+      } catch (error) {
+        console.error(error);
+      }
+      cameraBusy = false;
+      document.getElementById('startBtn').disabled = cameraRunning;
+      document.getElementById('stopBtn').disabled = cameraRunning;
+    }
+
+    async function changeCamera(mode) {
+      if (cameraBusy) return;
+      const wasRunning = cameraRunning;
+      if (wasRunning) await stopCamera();
+
+      currentCamera = mode;
+      document.getElementById('backCameraBtn').disabled = (mode === 'environment');
+      document.getElementById('frontCameraBtn').disabled = (mode === 'user');
+      document.getElementById('cameraMessage').textContent =
+        mode === 'environment' ? '外カメラを選択しました。' : '内カメラを選択しました。';
+
+      if (wasRunning) await startCamera();
+    }
+
+    document.getElementById('startBtn').addEventListener('click', startCamera);
+    document.getElementById('stopBtn').addEventListener('click', stopCamera);
+    document.getElementById('backCameraBtn').addEventListener('click', () => changeCamera('environment'));
+    document.getElementById('frontCameraBtn').addEventListener('click', () => changeCamera('user'));
+
+    function onScanSuccess(decodedText) {
+      if (scanProcessing) return;
+      scanProcessing = true;
+
+      const code = decodedText.trim();
+
+      if (!validCodes.includes(code)) {
+        document.getElementById('cameraMessage').textContent = 'その二次元バーコードは使用できません。';
+        scanProcessing = false;
+        return;
+      }
+
+      if (scannedCodes.has(code)) {
+        document.getElementById('cameraMessage').textContent = 'その二次元バーコードは既に使用済みです。';
+        scanProcessing = false;
+        return;
+      }
+
+      scannedCodes.add(code);
+      const earnedPoints = Math.floor(Math.random() * 3) + 3;
+      points += earnedPoints;
+
+      localStorage.setItem('points', points);
+      localStorage.setItem('scannedCodes', JSON.stringify([...scannedCodes]));
+
+      updatePoints();
+      document.getElementById('cameraMessage').textContent = `${code} を認識しました。${earnedPoints}pt 獲得！`;
+
+      setTimeout(() => {
+        scanProcessing = false;
+      }, 1000);
+    }
+
+    // 景品交換
+    function exchangeReward(rewardName, requiredPoints) {
+      const message = document.getElementById('exchangeMessage');
+      if (points < requiredPoints) {
+        message.textContent = 'ポイントが不足しています。';
+        return;
+      }
+
+      points -= requiredPoints;
+      const history = {
+        name: rewardName,
+        points: requiredPoints,
+        date: new Date().toLocaleString('ja-JP')
+      };
+      exchangeHistory.push(history);
+
+      localStorage.setItem('points', points);
+      localStorage.setItem('exchangeHistory', JSON.stringify(exchangeHistory));
+
+      updatePoints();
+      updateHistory();
+      message.textContent = `${rewardName} と交換が完了しました。`;
+    }
+
+    document.getElementById('reward20Button').addEventListener('click', () => exchangeReward('協力店で使用できる商品券', 20));
+    document.getElementById('reward15Button').addEventListener('click', () => exchangeReward('オリジナルキーホルダー', 15));
+    document.getElementById('reward10Button').addEventListener('click', () => exchangeReward('オリジナルステッカー', 10));
+
+    function updateHistory() {
+      const list = document.getElementById('historyList');
+      list.innerHTML = '';
+
+      if (exchangeHistory.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = '交換履歴はまだありません。';
+        list.appendChild(li);
+        return;
+      }
+
+      for (let i = exchangeHistory.length - 1; i >= 0; i--) {
+        const item = exchangeHistory[i];
+        const li = document.createElement('li');
+        li.textContent = `${item.date} : ${item.name} (${item.points}pt)`;
+        list.appendChild(li);
+      }
+    }
+
+    // 地図機能
+    function initializeMap() {
+      if (map) return;
+      if (typeof L === 'undefined') {
+        document.getElementById('locationMessage').textContent = '地図機能を読み込めません。ネットワークを確認してください。';
+        return;
+      }
+
+      map = L.map('map').setView([36.535, 136.645], 12);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      spotsData.forEach(spot => {
+        const popupContent = `
+          <div style="min-width: 200px;">
+            <h4 style="margin: 0 0 6px; font-size: 0.95rem; font-weight: 700;">${spot.name}</h4>
+            <p style="margin: 4px 0; font-size: 0.75rem; color: #64748b;"><strong>住所:</strong> ${spot.address}</p>
+            <p style="margin: 6px 0 0; font-size: 0.8rem; line-height: 1.5;">${spot.description}</p>
+          </div>
+        `;
+        L.marker([spot.lat, spot.lng]).addTo(map).bindPopup(popupContent);
+      });
+
+      const spotBounds = spotsData.map(spot => [spot.lat, spot.lng]);
+      map.fitBounds(spotBounds, { padding: [30, 30] });
+
+      getUserLocation();
+    }
+
+    function getUserLocation() {
+      const message = document.getElementById('locationMessage');
+      if (!navigator.geolocation) {
+        message.textContent = 'お使いの環境は位置情報に対応していません。';
+        return;
+      }
+      message.textContent = '現在地を取得中...';
+
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          message.textContent = '現在地を取得しました。';
+
+          if (userMarker) {
+            userMarker.setLatLng([lat, lng]);
+          } else {
+            userMarker = L.marker([lat, lng]).addTo(map).bindPopup('現在地');
+          }
+          map.setView([lat, lng], 15);
+        },
+        error => {
+          console.error(error);
+          message.textContent = '位置情報を取得できませんでした。';
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }
+
+    document.getElementById('locationButton').addEventListener('click', getUserLocation);
+
+    // リセット
+    document.getElementById('resetButton').addEventListener('click', () => {
+      const result = confirm('ポイント、読み取り履歴、景品交換履歴をすべて初期化します。よろしいですか？');
+      if (!result) return;
+
+      points = 0;
+      scannedCodes.clear();
+      exchangeHistory = [];
+
+      localStorage.removeItem('points');
+      localStorage.removeItem('scannedCodes');
+      localStorage.removeItem('exchangeHistory');
+
+      updatePoints();
+      updateHistory();
+
+      document.getElementById('exchangeMessage').textContent = '';
+      document.getElementById('cameraMessage').textContent = 'データを初期化しました。';
+      alert('データを初期化しました。');
+    });
+
+    // 初期化
+    updatePoints();
+    updateHistory();
+    document.getElementById('backCameraBtn').disabled = true;
+    showScreen('home');
+  </script>
+</body>
+
+</html>
