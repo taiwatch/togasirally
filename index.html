@@ -700,11 +700,22 @@
       <div class="card">
         <h2>景品交換</h2>
         <p class="desc">貯めたポイントをお好きな景品と交換できます。</p>
+        
+    <div class="points-box" style="padding: 14px;">
+      <div class="points-label">所持ポイント</div>
+      <span class="points-value" id="rewardPoints" style="font-size: 1.8rem;">0</span>
+      <span class="points-unit">pt</span>
+    </div>
 
-        <div class="points-box" style="padding: 14px;">
-          <div class="points-label">所持ポイント</div>
-          <span class="points-value" id="rewardPoints" style="font-size: 1.8rem;">0</span>
-          <span class="points-unit">pt</span>
+    <!-- 追加ここから：注意書き -->
+    <div style="background: #fef2f2; padding: 14px; border-radius: var(--radius-sm); font-size: 0.85rem; color: var(--danger); margin-bottom: 16px; line-height: 1.5; font-weight: 600; border: 1px solid #fca5a5;">
+      ※景品の交換はお一人様1回限りとさせていただきます。<br>
+      ※ブラウザの変更やキャッシュクリアによる複数回の交換はご遠慮ください。
+    </div>
+    <!-- 追加ここまで -->
+
+    <div class="reward-card">
+
         </div>
 
         <div class="reward-card">
@@ -1382,9 +1393,27 @@
     safeAddListener('frontCameraBtn', 'click', () => changeCamera('user'));
 
     // 景品交換
-    safeAddListener('reward20Button', 'click', () => exchangeReward('協力店で使用できる商品券', 20));
-    safeAddListener('reward15Button', 'click', () => exchangeReward('オリジナルキーホルダー', 15));
-    safeAddListener('reward10Button', 'click', () => exchangeReward('オリジナルステッカー', 10));
+// 景品交換（確認ポップアップ付き）
+safeAddListener('reward20Button', 'click', () => {
+  const ok = confirm('「協力店で使用できる商品券」と交換します。よろしいですか？\n\n※景品の交換はお一人様1回限りです。');
+  if (ok) {
+    exchangeReward('協力店で使用できる商品券', 20);
+  }
+});
+
+safeAddListener('reward15Button', 'click', () => {
+  const ok = confirm('「オリジナルキーホルダー」と交換します。よろしいですか？\n\n※景品の交換はお一人様1回限りです。');
+  if (ok) {
+    exchangeReward('オリジナルキーホルダー', 15);
+  }
+});
+
+safeAddListener('reward10Button', 'click', () => {
+  const ok = confirm('「オリジナルステッカー」と交換します。よろしいですか？\n\n※景品の交換はお一人様1回限りです。');
+  if (ok) {
+    exchangeReward('オリジナルステッカー', 10);
+  }
+});
 
     // 位置情報再取得
     safeAddListener('locationButton', 'click', getUserLocation);
