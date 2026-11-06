@@ -16,7 +16,7 @@
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- 二次元バーコード読み取り -->
+  <!-- 二次元バーコード読み取り (html5-qrcode) -->
   <script src="https://unpkg.com/html5-qrcode"></script>
 
   <!-- Leaflet 地図 -->
@@ -58,7 +58,6 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ヘッダー */
     header {
       position: sticky;
       top: 0;
@@ -79,14 +78,12 @@
       color: var(--text-main);
     }
 
-    /* メインエリア */
     main {
       max-width: 540px;
       margin: 0 auto;
       padding: 20px 16px calc(84px + env(safe-area-inset-bottom, 24px));
     }
 
-    /* 画面切り替え */
     .screen {
       display: none;
       opacity: 0;
@@ -100,7 +97,6 @@
       transform: translateY(0);
     }
 
-    /* カード */
     .card {
       background: var(--surface);
       border-radius: var(--radius-lg);
@@ -126,7 +122,6 @@
       margin-bottom: 20px;
     }
 
-    /* プログレスバー */
     .progress-card {
       background: var(--bg);
       border: 1px solid var(--border);
@@ -173,7 +168,6 @@
       background: linear-gradient(90deg, var(--success) 0%, #34d399 100%);
     }
 
-    /* ポイント表示ボックス */
     .points-box {
       background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
       border: 1px solid #bfdbfe;
@@ -207,7 +201,6 @@
       margin-left: 4px;
     }
 
-    /* ボタン共通 */
     button {
       font-family: inherit;
       outline: none;
@@ -285,7 +278,6 @@
       margin-bottom: 16px;
     }
 
-    /* カメラ・リーダー */
     #reader {
       width: 100%;
       border-radius: var(--radius-md);
@@ -304,7 +296,6 @@
       text-align: center;
     }
 
-    /* 地図 */
     #map {
       width: 100%;
       height: 380px;
@@ -313,7 +304,6 @@
       border: 1px solid var(--border);
     }
 
-    /* Leaflet ピン */
     .map-pin {
       width: 32px;
       height: 32px;
@@ -399,7 +389,6 @@
       color: var(--text-sub);
     }
 
-    /* 景品カード */
     .reward-card {
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
@@ -463,7 +452,6 @@
       border-bottom: none;
     }
 
-    /* 下部ナビゲーション */
     nav {
       position: fixed;
       bottom: 0;
@@ -524,7 +512,6 @@
       font-weight: 700;
     }
 
-    /* モーダルポップアップ */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -616,7 +603,6 @@
         <h2>ホーム</h2>
         <p class="desc">二次元バーコードを読み取ってスポットを巡り、ポイントを集めましょう。</p>
 
-        <!-- プログレスバー -->
         <div class="progress-card">
           <div class="progress-header">
             <span class="progress-title">巡回達成度</span>
@@ -657,7 +643,7 @@
         <button id="startBtn" class="btn-primary">カメラを起動</button>
         <button id="stopBtn" class="btn-outline" disabled>カメラを停止</button>
 
-        <p id="cameraMessage" class="message">カメラは停止中です。[cite: 1]</p>
+        <p id="cameraMessage" class="message">カメラは停止中です。</p>
 
         <div class="points-box" style="padding: 12px; margin-bottom: 0;">
           <div class="points-label">現在のポイント</div>
@@ -673,7 +659,7 @@
         <h2>スポットマップ</h2>
         <p class="desc">青は未訪問、緑は訪問済みのスポットです。</p>
 
-        <p id="locationMessage" class="message">現在地を取得しています...[cite: 1]</p>
+        <p id="locationMessage" class="message">現在地を取得しています...</p>
 
         <div id="map"></div>
 
@@ -692,7 +678,7 @@
     <section id="points" class="screen">
       <div class="card">
         <h2>ポイント確認</h2>
-        <p class="desc">スポットを回ってポイントを貯めましょう。[cite: 1]</p>
+        <p class="desc">スポットを回ってポイントを貯めましょう。</p>
 
         <div class="points-box">
           <div class="points-label">Total Points</div>
@@ -701,7 +687,7 @@
         </div>
 
         <div style="background: var(--bg); padding: 14px; border-radius: var(--radius-sm); font-size: 0.85rem; color: var(--text-sub); margin-bottom: 16px; line-height: 1.5;">
-          有効な二次元バーコードを読み取ると、1か所につき3〜5ポイント獲得できます。[cite: 1]
+          有効な二次元バーコードを読み取ると、1か所につき3〜5ポイント獲得できます。
         </div>
 
         <button id="pointsScanButton" class="btn-primary">二次元バーコードを読み取る</button>
@@ -713,7 +699,7 @@
     <section id="rewards" class="screen">
       <div class="card">
         <h2>景品交換</h2>
-        <p class="desc">貯めたポイントをお好きな景品と交換できます。[cite: 1]</p>
+        <p class="desc">貯めたポイントをお好きな景品と交換できます。</p>
 
         <div class="points-box" style="padding: 14px;">
           <div class="points-label">所持ポイント</div>
@@ -794,24 +780,36 @@
   <script>
     // ==================================================
     // 1. Supabase 初期設定
-    // ★ここをご自身の情報に書き換えてください★
+    // ★ご自身のProject URLとanon publicキーを設定してください★
     // ==================================================
-    const SUPABASE_URL ='https://qotbznsfzrngimnheufv.supabase.co/rest/v1/'
-    const SUPABASE_ANON_KEY ='sb_publishable_rK4lYVBmO3oPsgLjog4Q3A_PhKkq8m-';
-    const supabaseClient = (SUPABASE_URL.startsWith('http') && SUPABASE_ANON_KEY.length > 20)
-      ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-      : null;
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 
-    // ユーザーUUID（ローカル保持 & DB同期）
+    let supabaseClient = null;
+    try {
+      if (
+        typeof window.supabase !== 'undefined' &&
+        SUPABASE_URL &&
+        SUPABASE_URL.startsWith('http') &&
+        !SUPABASE_URL.includes('YOUR_SUPABASE_URL') &&
+        SUPABASE_ANON_KEY &&
+        !SUPABASE_ANON_KEY.includes('YOUR_SUPABASE_ANON_KEY')
+      ) {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      } else {
+        console.warn('Supabase接続情報が未設定のため、ローカル保存モードで動作します。');
+      }
+    } catch (e) {
+      console.error('Supabase初期化エラー（ローカル保存モードで起動）:', e);
+    }
+
+    // 状態管理
     let userId = localStorage.getItem('togashi_user_id');
+    let points = Number(localStorage.getItem('points')) || 0;
+    let scannedCodes = new Set(JSON.parse(localStorage.getItem('scannedCodes') || '[]'));
+    let exchangeHistory = JSON.parse(localStorage.getItem('exchangeHistory') || '[]');
 
-    // 状態変数
-    let points = 0;
-    let scannedCodes = new Set();
-    let exchangeHistory = [];
-    let spotsData = []; // Supabaseまたはフォールバックから読み込み
-
-    // フォールバック用の初期スポットデータ（オフライン時やキー未設定時用）
+    // 史跡マスタ（フォールバック用・修正済み正確座標）
     const fallbackSpots = [
       { id: 1, name: '富樫館跡', code: 'togashi1', lat: 36.5331, lng: 136.6188, address: '野々市市本町2丁目付近（布市神社境内）', description: '富樫氏歴代の居館跡と伝えられる場所です。布市神社境内に石碑が建てられています。' },
       { id: 2, name: '守護所・富樫館跡', code: 'togashi2', lat: 36.5285, lng: 136.6202, address: '野々市市住吉町235番地2', description: '1335年に加賀の守護となった富樫高家の館で、政務を行った守護所でもあります。発掘調査によって館を囲む堀の一部が確認されています。' },
@@ -822,8 +820,9 @@
       { id: 7, name: '伝燈寺', code: 'togashi7', lat: 36.56752, lng: 136.71550, address: '石川県金沢市伝燈寺町付近', description: '富樫氏と関わりのある寺院です。富樫氏ゆかりの歴史を伝える場所の一つです。' },
       { id: 8, name: '御廟谷', code: 'togashi8', lat: 36.50456, lng: 136.62800, address: '石川県金沢市額谷町付近', description: '富樫氏の墓所と伝えられる場所です。富樫氏の歴史を知ることができる場所の一つです。' }
     ];
+    let spotsData = [...fallbackSpots];
 
-    // カメラ・地図関連
+    // カメラ・マップ制御変数
     let scanner = null;
     let cameraRunning = false;
     let currentCamera = 'environment';
@@ -834,26 +833,124 @@
     let mapMarkers = [];
 
     // ==================================================
-    // 2. ユーザーおよびデータベースの初期化
+    // 2. 安全なイベント登録ヘルパー関数
+    // ==================================================
+    function safeAddListener(id, event, handler) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener(event, handler);
+      } else {
+        console.warn(`Element #${id} not found.`);
+      }
+    }
+
+    // ==================================================
+    // 3. 画面切り替え & 表示更新
+    // ==================================================
+    function showScreen(screenName) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById(screenName);
+      if (target) target.classList.add('active');
+
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('selected'));
+      const navMap = {
+        home: 'navHome',
+        scan: 'navScan',
+        mapScreen: 'navMap',
+        points: 'navPoints',
+        rewards: 'navRewards'
+      };
+      const selectedBtn = document.getElementById(navMap[screenName]);
+      if (selectedBtn) selectedBtn.classList.add('selected');
+
+      if (screenName !== 'scan' && cameraRunning) {
+        stopCamera();
+      }
+
+      if (screenName === 'mapScreen') {
+        setTimeout(() => {
+          initializeMap();
+          if (map) {
+            map.invalidateSize();
+            refreshMapPins();
+          }
+        }, 120);
+      }
+
+      updatePoints();
+    }
+
+    function updatePoints() {
+      const elIds = ['homePoints', 'scanPoints', 'totalPoints', 'rewardPoints'];
+      elIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = points;
+      });
+
+      const totalCount = spotsData.length || 8;
+      const visitedCount = scannedCodes.size;
+      const percentage = Math.round((visitedCount / totalCount) * 100);
+
+      const ratioEl = document.getElementById('progressRatio');
+      const fillEl = document.getElementById('progressFill');
+
+      if (ratioEl) ratioEl.textContent = `${visitedCount} / ${totalCount} 箇所 (${percentage}%)`;
+      if (fillEl) {
+        fillEl.style.width = `${percentage}%`;
+        if (percentage === 100) {
+          fillEl.classList.add('completed');
+          if (ratioEl) ratioEl.textContent = '制覇完了！ (100%)';
+        } else {
+          fillEl.classList.remove('completed');
+        }
+      }
+
+      updateSpotListUI();
+    }
+
+    // モーダルポップアップ
+    function openPointModal(spotName, earnedPoints, totalPoints) {
+      const nameEl = document.getElementById('modalSpotName');
+      const earnedEl = document.getElementById('modalEarnedPoints');
+      const totalEl = document.getElementById('modalTotalPoints');
+      const modal = document.getElementById('pointModal');
+
+      if (nameEl) nameEl.textContent = spotName;
+      if (earnedEl) earnedEl.textContent = `+${earnedPoints}`;
+      if (totalEl) totalEl.textContent = totalPoints;
+      if (modal) modal.classList.add('active');
+    }
+
+    function closePointModal() {
+      const modal = document.getElementById('pointModal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    // ==================================================
+    // 4. アプリ起動とSupabaseデータの安全な同期
     // ==================================================
     async function initApp() {
-      // スポット一覧の取得
-      if (supabaseClient) {
-        const { data: dbSpots, error } = await supabaseClient
+      if (!supabaseClient) {
+        updatePoints();
+        updateHistory();
+        return;
+      }
+
+      try {
+        // スポットマスタの同期
+        const { data: dbSpots, error: spotErr } = await supabaseClient
           .from('spots')
           .select('*')
           .order('id', { ascending: true });
-        spotsData = (!error && dbSpots && dbSpots.length > 0) ? dbSpots : fallbackSpots;
-      } else {
-        spotsData = fallbackSpots;
-      }
+        if (!spotErr && dbSpots && dbSpots.length > 0) {
+          spotsData = dbSpots;
+        }
 
-      // ユーザーの初期化
-      if (supabaseClient) {
+        // ユーザーアカウントの作成または復元
         if (!userId) {
           const { data, error } = await supabaseClient
             .from('users')
-            .insert([{ total_points: 0 }])
+            .insert([{ total_points: points }])
             .select()
             .single();
 
@@ -863,7 +960,6 @@
             points = data.total_points;
           }
         } else {
-          // 既存ユーザーのポイントと履歴を取得
           const { data: userData } = await supabaseClient
             .from('users')
             .select('total_points')
@@ -872,19 +968,24 @@
 
           if (userData) {
             points = userData.total_points;
+            localStorage.setItem('points', points);
           }
 
-          // スキャン履歴取得
+          // 訪問済みスポットの復元
           const { data: stampLogs } = await supabaseClient
             .from('stamp_logs')
             .select('spot_id, spots(code)')
             .eq('user_id', userId);
 
           if (stampLogs) {
-            scannedCodes = new Set(stampLogs.map(log => log.spots?.code || `togashi${log.spot_id}`));
+            stampLogs.forEach(log => {
+              const code = log.spots?.code || `togashi${log.spot_id}`;
+              scannedCodes.add(code);
+            });
+            localStorage.setItem('scannedCodes', JSON.stringify([...scannedCodes]));
           }
 
-          // 交換履歴取得
+          // 景品交換履歴の復元
           const { data: exLogs } = await supabaseClient
             .from('exchange_logs')
             .select('*')
@@ -897,154 +998,87 @@
               points: item.points_spent,
               date: new Date(item.exchanged_at).toLocaleString('ja-JP')
             }));
+            localStorage.setItem('exchangeHistory', JSON.stringify(exchangeHistory));
           }
         }
-      } else {
-        // Supabase未設定時のローカルフォールバック
-        points = Number(localStorage.getItem('points')) || 0;
-        scannedCodes = new Set(JSON.parse(localStorage.getItem('scannedCodes') || '[]'));
-        exchangeHistory = JSON.parse(localStorage.getItem('exchangeHistory') || '[]');
+      } catch (err) {
+        console.warn('Supabaseとの同期中に例外が発生しました（ローカルデータを使用します）:', err);
       }
 
       updatePoints();
       updateHistory();
+      if (map) refreshMapPins();
     }
-
-    function updatePoints() {
-      document.getElementById('homePoints').textContent = points;
-      document.getElementById('scanPoints').textContent = points;
-      document.getElementById('totalPoints').textContent = points;
-      document.getElementById('rewardPoints').textContent = points;
-
-      const totalCount = spotsData.length || 8;
-      const visitedCount = scannedCodes.size;
-      const percentage = Math.round((visitedCount / totalCount) * 100);
-
-      const ratioEl = document.getElementById('progressRatio');
-      const fillEl = document.getElementById('progressFill');
-
-      ratioEl.textContent = `${visitedCount} / ${totalCount} 箇所 (${percentage}%)`;
-      fillEl.style.width = `${percentage}%`;
-
-      if (percentage === 100) {
-        fillEl.classList.add('completed');
-        ratioEl.textContent = '制覇完了！ (100%)';
-      } else {
-        fillEl.classList.remove('completed');
-      }
-
-      updateSpotListUI();
-    }
-
-    function showScreen(screenName) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      const target = document.getElementById(screenName);
-      if (!target) return;
-      target.classList.add('active');
-
-      document.querySelectorAll('nav button').forEach(b => b.classList.remove('selected'));
-      const navMap = { home: 'navHome', scan: 'navScan', mapScreen: 'navMap', points: 'navPoints', rewards: 'navRewards' };
-      const selectedBtn = document.getElementById(navMap[screenName]);
-      if (selectedBtn) selectedBtn.classList.add('selected');
-
-      if (screenName !== 'scan' && cameraRunning) stopCamera();
-
-      if (screenName === 'mapScreen') {
-        setTimeout(() => {
-          initializeMap();
-          if (map) {
-            map.invalidateSize();
-            refreshMapPins();
-          }
-        }, 120);
-      }
-      updatePoints();
-    }
-
-    // ナビゲーション
-    document.getElementById('navHome').addEventListener('click', () => showScreen('home'));
-    document.getElementById('navScan').addEventListener('click', () => showScreen('scan'));
-    document.getElementById('navMap').addEventListener('click', () => showScreen('mapScreen'));
-    document.getElementById('navPoints').addEventListener('click', () => showScreen('points'));
-    document.getElementById('navRewards').addEventListener('click', () => showScreen('rewards'));
-
-    document.getElementById('homeScanButton').addEventListener('click', () => showScreen('scan'));
-    document.getElementById('homeMapButton').addEventListener('click', () => showScreen('mapScreen'));
-    document.getElementById('homeRewardsButton').addEventListener('click', () => showScreen('rewards'));
-    document.getElementById('togashiSiteButton').addEventListener('click', () => window.open('https://www.city.nonoichi.lg.jp/', '_blank'));
-    document.getElementById('pointsScanButton').addEventListener('click', () => showScreen('scan'));
-    document.getElementById('pointsRewardButton').addEventListener('click', () => showScreen('rewards'));
-
-    // モーダル
-    function openPointModal(spotName, earnedPoints, totalPoints) {
-      document.getElementById('modalSpotName').textContent = spotName;
-      document.getElementById('modalEarnedPoints').textContent = `+${earnedPoints}`;
-      document.getElementById('modalTotalPoints').textContent = totalPoints;
-      document.getElementById('pointModal').classList.add('active');
-    }
-
-    function closePointModal() {
-      document.getElementById('pointModal').classList.remove('active');
-    }
-    document.getElementById('modalCloseBtn').addEventListener('click', closePointModal);
-    document.getElementById('pointModal').addEventListener('click', (e) => {
-      if (e.target === document.getElementById('pointModal')) closePointModal();
-    });
 
     // ==================================================
-    // 3. カメラ & QRスキャン（Supabase RPC呼び出し）
+    // 5. カメラ・二次元バーコード読み取り
     // ==================================================
     async function startCamera() {
       if (cameraBusy || cameraRunning) return;
+      const msg = document.getElementById('cameraMessage');
+
       if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-        document.getElementById('cameraMessage').textContent = 'カメラを使用するにはHTTPS環境で開いてください。[cite: 1]';
+        if (msg) msg.textContent = 'カメラを使用するにはHTTPS環境で開いてください。';
         return;
       }
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        document.getElementById('cameraMessage').textContent = 'カメラを利用できません。HTTPS通信とカメラの許可を確認してください。[cite: 1]';
+        if (msg) msg.textContent = 'カメラを利用できません。HTTPS接続と権限を確認してください。';
         return;
       }
       if (typeof Html5Qrcode === 'undefined') {
-        document.getElementById('cameraMessage').textContent = 'ライブラリの読み込みに失敗しました。[cite: 1]';
+        if (msg) msg.textContent = 'スキャンライブラリの読み込みに失敗しました。';
         return;
       }
 
       cameraBusy = true;
-      document.getElementById('startBtn').disabled = true;
-      document.getElementById('cameraMessage').textContent = 'カメラを起動しています...[cite: 1]';
+      const startBtn = document.getElementById('startBtn');
+      const stopBtn = document.getElementById('stopBtn');
+      if (startBtn) startBtn.disabled = true;
+      if (msg) msg.textContent = 'カメラを起動しています...';
 
       try {
         if (!scanner) scanner = new Html5Qrcode('reader');
         await scanner.start(
           { facingMode: currentCamera },
-          { fps: 10, qrbox: { width: 220, height: 220 } },
+          {
+            fps: 15,
+            qrbox: (w, h) => {
+              const size = Math.floor(Math.min(w, h) * 0.75);
+              return { width: size, height: size };
+            }
+          },
           onScanSuccess,
           () => {}
         );
         cameraRunning = true;
-        document.getElementById('stopBtn').disabled = false;
-        document.getElementById('cameraMessage').textContent =
-          currentCamera === 'environment' ? '外カメラで読み取り中です。[cite: 1]' : '内カメラで読み取り中です。[cite: 1]';
+        if (stopBtn) stopBtn.disabled = false;
+        if (msg) msg.textContent = currentCamera === 'environment' ? '外カメラで読み取り中です。' : '内カメラで読み取り中です。';
       } catch (error) {
         console.error(error);
-        document.getElementById('cameraMessage').textContent = 'カメラを起動できません。[cite: 1]';
+        if (msg) msg.textContent = 'カメラを起動できません。設定から許可を確認してください。';
       }
       cameraBusy = false;
-      document.getElementById('startBtn').disabled = cameraRunning;
+      if (startBtn) startBtn.disabled = cameraRunning;
     }
 
     async function stopCamera() {
       if (!scanner || !cameraRunning || cameraBusy) return;
       cameraBusy = true;
-      document.getElementById('stopBtn').disabled = true;
+      const startBtn = document.getElementById('startBtn');
+      const stopBtn = document.getElementById('stopBtn');
+      const msg = document.getElementById('cameraMessage');
+      if (stopBtn) stopBtn.disabled = true;
+
       try {
         await scanner.stop();
         cameraRunning = false;
-        document.getElementById('cameraMessage').textContent = 'カメラは停止中です。[cite: 1]';
-      } catch (e) { console.error(e); }
+        if (msg) msg.textContent = 'カメラは停止中です。';
+      } catch (e) {
+        console.error(e);
+      }
       cameraBusy = false;
-      document.getElementById('startBtn').disabled = cameraRunning;
-      document.getElementById('stopBtn').disabled = cameraRunning;
+      if (startBtn) startBtn.disabled = cameraRunning;
+      if (stopBtn) stopBtn.disabled = cameraRunning;
     }
 
     async function changeCamera(mode) {
@@ -1052,57 +1086,71 @@
       const wasRunning = cameraRunning;
       if (wasRunning) await stopCamera();
       currentCamera = mode;
-      document.getElementById('backCameraBtn').disabled = (mode === 'environment');
-      document.getElementById('frontCameraBtn').disabled = (mode === 'user');
+      const backBtn = document.getElementById('backCameraBtn');
+      const frontBtn = document.getElementById('frontCameraBtn');
+      if (backBtn) backBtn.disabled = (mode === 'environment');
+      if (frontBtn) frontBtn.disabled = (mode === 'user');
       if (wasRunning) await startCamera();
     }
 
-    document.getElementById('startBtn').addEventListener('click', startCamera);
-    document.getElementById('stopBtn').addEventListener('click', stopCamera);
-    document.getElementById('backCameraBtn').addEventListener('click', () => changeCamera('environment'));
-    document.getElementById('frontCameraBtn').addEventListener('click', () => changeCamera('user'));
-
-    // スキャン成功時（サーバー検証）
     async function onScanSuccess(decodedText) {
       if (scanProcessing) return;
       scanProcessing = true;
       const code = decodedText.trim();
+      const msg = document.getElementById('cameraMessage');
 
       if (navigator.vibrate) navigator.vibrate([100, 50, 150]);
 
       if (supabaseClient && userId) {
-        // Supabase の RPC 関数を呼び出して安全に検証・加算
-        const { data, error } = await supabaseClient.rpc('scan_qr_code', {
-          p_user_id: userId,
-          p_code: code
-        });
+        try {
+          const { data, error } = await supabaseClient.rpc('scan_qr_code', {
+            p_user_id: userId,
+            p_code: code
+          });
 
-        if (error || !data.success) {
-          document.getElementById('cameraMessage').textContent = data?.message || '通信エラーが発生しました。';
-          scanProcessing = false;
-          return;
+          if (error || !data.success) {
+            if (msg) msg.textContent = data?.message || '通信エラーが発生しました。';
+            scanProcessing = false;
+            return;
+          }
+
+          points = data.total_points;
+          scannedCodes.add(code);
+          localStorage.setItem('points', points);
+          localStorage.setItem('scannedCodes', JSON.stringify([...scannedCodes]));
+
+          updatePoints();
+          openPointModal(data.spot_name, data.earned_points, points);
+          if (msg) msg.textContent = `${data.spot_name} で +${data.earned_points}pt 獲得！`;
+        } catch (rpcErr) {
+          console.error(rpcErr);
+          if (msg) msg.textContent = '通信処理に失敗しました。';
         }
-
-        points = data.total_points;
-        scannedCodes.add(code);
-        updatePoints();
-        openPointModal(data.spot_name, data.earned_points, points);
-        document.getElementById('cameraMessage').textContent = `${data.spot_name} で +${data.earned_points}pt 獲得！`;
       } else {
-        // フォールバック（ローカル）
-        if (scannedCodes.has(code)) {
-          document.getElementById('cameraMessage').textContent = 'そのコードは既に使用済みです。[cite: 1]';
+        // ローカル処理（フォールバック）
+        const spot = spotsData.find(s => s.code === code);
+        if (!spot) {
+          if (msg) msg.textContent = '無効な二次元バーコードです。';
           scanProcessing = false;
           return;
         }
+
+        if (scannedCodes.has(code)) {
+          if (msg) msg.textContent = 'このコードは既に読み取り済みです。';
+          scanProcessing = false;
+          return;
+        }
+
         scannedCodes.add(code);
         const earned = Math.floor(Math.random() * 3) + 3;
         points += earned;
+
         localStorage.setItem('points', points);
         localStorage.setItem('scannedCodes', JSON.stringify([...scannedCodes]));
+
         updatePoints();
-        const spot = spotsData.find(s => s.code === code);
-        openPointModal(spot ? spot.name : code, earned, points);
+        openPointModal(spot.name, earned, points);
+        if (msg) msg.textContent = `${spot.name} で +${earned}pt 獲得！`;
       }
 
       if (map) refreshMapPins();
@@ -1110,72 +1158,81 @@
     }
 
     // ==================================================
-    // 4. 景品交換（Supabase RPC呼び出し）
+    // 6. 景品交換
     // ==================================================
     async function exchangeReward(rewardName, requiredPoints) {
-      const message = document.getElementById('exchangeMessage');
+      const msg = document.getElementById('exchangeMessage');
 
       if (supabaseClient && userId) {
-        const { data, error } = await supabaseClient.rpc('exchange_reward', {
-          p_user_id: userId,
-          p_reward_name: rewardName,
-          p_required_points: requiredPoints
-        });
+        try {
+          const { data, error } = await supabaseClient.rpc('exchange_reward', {
+            p_user_id: userId,
+            p_reward_name: rewardName,
+            p_required_points: requiredPoints
+          });
 
-        if (error || !data.success) {
-          message.textContent = data?.message || '交換処理に失敗しました。';
-          return;
+          if (error || !data.success) {
+            if (msg) msg.textContent = data?.message || '交換処理に失敗しました。';
+            return;
+          }
+
+          if (navigator.vibrate) navigator.vibrate(120);
+          points = data.total_points;
+          localStorage.setItem('points', points);
+          updatePoints();
+
+          const { data: exLogs } = await supabaseClient
+            .from('exchange_logs')
+            .select('*')
+            .eq('user_id', userId)
+            .order('exchanged_at', { ascending: false });
+
+          if (exLogs) {
+            exchangeHistory = exLogs.map(item => ({
+              name: item.reward_name,
+              points: item.points_spent,
+              date: new Date(item.exchanged_at).toLocaleString('ja-JP')
+            }));
+            localStorage.setItem('exchangeHistory', JSON.stringify(exchangeHistory));
+          }
+          updateHistory();
+          if (msg) msg.textContent = data.message;
+        } catch (exErr) {
+          console.error(exErr);
+          if (msg) msg.textContent = '通信処理に失敗しました。';
         }
-
-        if (navigator.vibrate) navigator.vibrate(120);
-        points = data.total_points;
-        updatePoints();
-
-        // 履歴を再読み込み
-        const { data: exLogs } = await supabaseClient
-          .from('exchange_logs')
-          .select('*')
-          .eq('user_id', userId)
-          .order('exchanged_at', { ascending: false });
-
-        if (exLogs) {
-          exchangeHistory = exLogs.map(item => ({
-            name: item.reward_name,
-            points: item.points_spent,
-            date: new Date(item.exchanged_at).toLocaleString('ja-JP')
-          }));
-        }
-        updateHistory();
-        message.textContent = data.message;
       } else {
-        // ローカルフォールバック
         if (points < requiredPoints) {
-          message.textContent = 'ポイントが不足しています。';
+          if (msg) msg.textContent = 'ポイントが不足しています。';
           return;
         }
+        if (navigator.vibrate) navigator.vibrate(120);
         points -= requiredPoints;
-        exchangeHistory.push({ name: rewardName, points: requiredPoints, date: new Date().toLocaleString('ja-JP') });
+        exchangeHistory.unshift({
+          name: rewardName,
+          points: requiredPoints,
+          date: new Date().toLocaleString('ja-JP')
+        });
         localStorage.setItem('points', points);
         localStorage.setItem('exchangeHistory', JSON.stringify(exchangeHistory));
         updatePoints();
         updateHistory();
-        message.textContent = `${rewardName} と交換しました。`;
+        if (msg) msg.textContent = `${rewardName} と交換しました。`;
       }
     }
 
-    document.getElementById('reward20Button').addEventListener('click', () => exchangeReward('協力店で使用できる商品券', 20));
-    document.getElementById('reward15Button').addEventListener('click', () => exchangeReward('オリジナルキーホルダー', 15));
-    document.getElementById('reward10Button').addEventListener('click', () => exchangeReward('オリジナルステッカー', 10));
-
     function updateHistory() {
       const list = document.getElementById('historyList');
+      if (!list) return;
       list.innerHTML = '';
+
       if (exchangeHistory.length === 0) {
         const li = document.createElement('li');
-        li.textContent = '交換履歴はまだありません。[cite: 1]';
+        li.textContent = '交換履歴はまだありません。';
         list.appendChild(li);
         return;
       }
+
       exchangeHistory.forEach(item => {
         const li = document.createElement('li');
         li.textContent = `${item.date} : ${item.name} (${item.points}pt)`;
@@ -1184,7 +1241,7 @@
     }
 
     // ==================================================
-    // 5. 地図 & スポットUI
+    // 7. 地図・スポット連携
     // ==================================================
     function updateSpotListUI() {
       const container = document.getElementById('spotListContainer');
@@ -1266,15 +1323,15 @@
     }
 
     function getUserLocation() {
-      const message = document.getElementById('locationMessage');
+      const msg = document.getElementById('locationMessage');
       if (!navigator.geolocation) return;
-      message.textContent = '現在地を取得中...';
+      if (msg) msg.textContent = '現在地を取得中...';
 
       navigator.geolocation.getCurrentPosition(
-        position => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          message.textContent = '現在地を取得しました。';
+        pos => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          if (msg) msg.textContent = '現在地を取得しました。';
 
           const userIcon = L.divIcon({
             className: 'user-pin-wrapper',
@@ -1285,24 +1342,66 @@
 
           if (userMarker) {
             userMarker.setLatLng([lat, lng]);
-          } else {
+          } else if (map) {
             userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(map).bindPopup('現在地');
           }
-          map.setView([lat, lng], 15);
+          if (map) map.setView([lat, lng], 15);
         },
-        error => {
-          console.error(error);
-          message.textContent = '位置情報を取得できませんでした。';
+        err => {
+          console.error(err);
+          if (msg) msg.textContent = '位置情報を取得できませんでした。';
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     }
-    document.getElementById('locationButton').addEventListener('click', getUserLocation);
 
-    // リセット
-    document.getElementById('resetButton').addEventListener('click', async () => {
-      const result = confirm('データを初期化します。よろしいですか？');
-      if (!result) return;
+    // ==================================================
+    // 8. イベントリスナー登録 & 安全な起動シーケンス
+    // ==================================================
+    // ナビゲーション
+    safeAddListener('navHome', 'click', () => showScreen('home'));
+    safeAddListener('navScan', 'click', () => showScreen('scan'));
+    safeAddListener('navMap', 'click', () => showScreen('mapScreen'));
+    safeAddListener('navPoints', 'click', () => showScreen('points'));
+    safeAddListener('navRewards', 'click', () => showScreen('rewards'));
+
+    // ホーム画面内リンク
+    safeAddListener('homeScanButton', 'click', () => showScreen('scan'));
+    safeAddListener('homeMapButton', 'click', () => showScreen('mapScreen'));
+    safeAddListener('homeRewardsButton', 'click', () => showScreen('rewards'));
+    safeAddListener('togashiSiteButton', 'click', () => window.open('https://www.city.nonoichi.lg.jp/', '_blank'));
+
+    // ポイント画面内リンク
+    safeAddListener('pointsScanButton', 'click', () => showScreen('scan'));
+    safeAddListener('pointsRewardButton', 'click', () => showScreen('rewards'));
+
+    // カメラ操作
+    safeAddListener('startBtn', 'click', startCamera);
+    safeAddListener('stopBtn', 'click', stopCamera);
+    safeAddListener('backCameraBtn', 'click', () => changeCamera('environment'));
+    safeAddListener('frontCameraBtn', 'click', () => changeCamera('user'));
+
+    // 景品交換
+    safeAddListener('reward20Button', 'click', () => exchangeReward('協力店で使用できる商品券', 20));
+    safeAddListener('reward15Button', 'click', () => exchangeReward('オリジナルキーホルダー', 15));
+    safeAddListener('reward10Button', 'click', () => exchangeReward('オリジナルステッカー', 10));
+
+    // 位置情報再取得
+    safeAddListener('locationButton', 'click', getUserLocation);
+
+    // モーダル閉じる
+    safeAddListener('modalCloseBtn', 'click', closePointModal);
+    const modalEl = document.getElementById('pointModal');
+    if (modalEl) {
+      modalEl.addEventListener('click', (e) => {
+        if (e.target === modalEl) closePointModal();
+      });
+    }
+
+    // データ初期化
+    safeAddListener('resetButton', 'click', async () => {
+      const ok = confirm('ポイント・巡回履歴・景品交換履歴をすべて初期化します。よろしいですか？');
+      if (!ok) return;
 
       localStorage.removeItem('togashi_user_id');
       localStorage.removeItem('points');
@@ -1319,10 +1418,15 @@
       alert('データを初期化しました。');
     });
 
-    // 初期化実行
-    document.getElementById('backCameraBtn').disabled = true;
-    initApp();
+    // 初期起動実行
+    const backCam = document.getElementById('backCameraBtn');
+    if (backCam) backCam.disabled = true;
+
+    // 先にホーム画面を表示（同期通信を待たずに画面遷移を可能にする）
     showScreen('home');
+
+    // バックグラウンドで非同期データを同期取得
+    initApp().catch(e => console.error('初期化同期エラー:', e));
   </script>
 </body>
 
