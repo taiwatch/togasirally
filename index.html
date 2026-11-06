@@ -13,6 +13,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <!-- 二次元バーコード読み取り -->
   <script src="https://unpkg.com/html5-qrcode"></script>
 
@@ -55,7 +58,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ヘッダー (グラスモーフィズム) */
+    /* ヘッダー */
     header {
       position: sticky;
       top: 0;
@@ -123,7 +126,7 @@
       margin-bottom: 20px;
     }
 
-    /* プログレスバー（進捗状況） */
+    /* プログレスバー */
     .progress-card {
       background: var(--bg);
       border: 1px solid var(--border);
@@ -310,7 +313,7 @@
       border: 1px solid var(--border);
     }
 
-    /* Leaflet カスタムピン */
+    /* Leaflet ピン */
     .map-pin {
       width: 32px;
       height: 32px;
@@ -323,7 +326,6 @@
       font-size: 13px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
       border: 2px solid white;
-      transition: all 0.2s ease;
     }
 
     .map-pin.unvisited {
@@ -612,7 +614,7 @@
     <section id="home" class="screen active">
       <div class="card">
         <h2>ホーム</h2>
-        <p class="desc">二次元バーコードを読み取ってスポットを巡り、ポイントを集めましょう。[cite: 1]</p>
+        <p class="desc">二次元バーコードを読み取ってスポットを巡り、ポイントを集めましょう。</p>
 
         <!-- プログレスバー -->
         <div class="progress-card">
@@ -643,7 +645,7 @@
     <section id="scan" class="screen">
       <div class="card">
         <h2>スキャン</h2>
-        <p class="desc">カメラを起動してスポットの二次元バーコードを映してください。[cite: 1]</p>
+        <p class="desc">カメラを起動してスポットの二次元バーコードを映してください。</p>
 
         <div class="btn-group">
           <button id="backCameraBtn" class="btn-outline" style="margin: 0;">外カメラ</button>
@@ -753,7 +755,7 @@
     </section>
   </main>
 
-  <!-- ポイント獲得モーダルポップアップ -->
+  <!-- モーダルポップアップ -->
   <div id="pointModal" class="modal-overlay">
     <div class="modal-card">
       <div id="modalSpotName" class="modal-spot">スポット来訪</div>
@@ -768,125 +770,145 @@
   <!-- 下部固定メニュー -->
   <nav>
     <button id="navHome" class="nav-btn selected">
-      <svg viewBox="0 0 24 24">
-        <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1V9.5z"/>
-      </svg>
+      <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1V9.5z"/></svg>
       <span class="label">ホーム</span>
     </button>
     <button id="navScan" class="nav-btn">
-      <svg viewBox="0 0 24 24">
-        <path d="M4 7V4h3M20 7V4h-3M4 17v3h3M20 17v3h-3M9 9h6v6H9z"/>
-      </svg>
+      <svg viewBox="0 0 24 24"><path d="M4 7V4h3M20 7V4h-3M4 17v3h3M20 17v3h-3M9 9h6v6H9z"/></svg>
       <span class="label">スキャン</span>
     </button>
     <button id="navMap" class="nav-btn">
-      <svg viewBox="0 0 24 24">
-        <path d="M12 21s-6-5.33-6-10a6 6 0 1 1 12 0c0 4.67-6 10-6 10z"/>
-        <circle cx="12" cy="11" r="2.5" fill="currentColor"/>
-      </svg>
+      <svg viewBox="0 0 24 24"><path d="M12 21s-6-5.33-6-10a6 6 0 1 1 12 0c0 4.67-6 10-6 10z"/><circle cx="12" cy="11" r="2.5" fill="currentColor"/></svg>
       <span class="label">マップ</span>
     </button>
     <button id="navPoints" class="nav-btn">
-      <svg viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="9"/>
-        <path d="M12 7v10M9 9.5h6a1.5 1.5 0 0 1 0 3H9h6a1.5 1.5 0 0 1 0 3H9"/>
-      </svg>
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5h6a1.5 1.5 0 0 1 0 3H9h6a1.5 1.5 0 0 1 0 3H9"/></svg>
       <span class="label">ポイント</span>
     </button>
     <button id="navRewards" class="nav-btn">
-      <svg viewBox="0 0 24 24">
-        <rect x="3" y="8" width="18" height="13" rx="2"/>
-        <path d="M12 8v13M3 12h18M12 8a3 3 0 1 0-3-3c2 0 3 3 3 3zm0 0a3 3 0 1 1 3-3c-2 0-3 3-3 3z"/>
-      </svg>
+      <svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8a3 3 0 1 0-3-3c2 0 3 3 3 3zm0 0a3 3 0 1 1 3-3c-2 0-3 3-3 3z"/></svg>
       <span class="label">景品</span>
     </button>
   </nav>
 
   <script>
-    let points = Number(localStorage.getItem('points')) || 0;
-    let scannedCodes = new Set(JSON.parse(localStorage.getItem('scannedCodes') || '[]'));
+    // ==================================================
+    // 1. Supabase 初期設定
+    // ★ここをご自身の情報に書き換えてください★
+    // ==================================================
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const supabaseClient = (SUPABASE_URL.startsWith('http') && SUPABASE_ANON_KEY.length > 20)
+      ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      : null;
 
-    const validCodes = [
-      'togashi1', 'togashi2', 'togashi3', 'togashi4',
-      'togashi5', 'togashi6', 'togashi7', 'togashi8'
+    // ユーザーUUID（ローカル保持 & DB同期）
+    let userId = localStorage.getItem('togashi_user_id');
+
+    // 状態変数
+    let points = 0;
+    let scannedCodes = new Set();
+    let exchangeHistory = [];
+    let spotsData = []; // Supabaseまたはフォールバックから読み込み
+
+    // フォールバック用の初期スポットデータ（オフライン時やキー未設定時用）
+    const fallbackSpots = [
+      { id: 1, name: '富樫館跡', code: 'togashi1', lat: 36.5331, lng: 136.6188, address: '野々市市本町2丁目付近（布市神社境内）', description: '富樫氏歴代の居館跡と伝えられる場所です。布市神社境内に石碑が建てられています。' },
+      { id: 2, name: '守護所・富樫館跡', code: 'togashi2', lat: 36.5285, lng: 136.6202, address: '野々市市住吉町235番地2', description: '1335年に加賀の守護となった富樫高家の館で、政務を行った守護所でもあります。発掘調査によって館を囲む堀の一部が確認されています。' },
+      { id: 3, name: '布市神社', code: 'togashi3', lat: 36.5334, lng: 136.6184, address: '野々市市本町2丁目14-16', description: '富樫氏と関わりのある神社です。富樫氏ゆかりの場所として知られています。' },
+      { id: 4, name: '大乗寺跡', code: 'togashi4', lat: 36.5362, lng: 136.6136, address: '野々市市本町1丁目付近', description: '富樫氏と深い関係を持った大乗寺の旧跡です。大乗寺は野々市で発展した後、各地を経て現在の金沢市へ移りました。' },
+      { id: 5, name: '野々市市郷土資料館・ふるさと歴史館', code: 'togashi5', lat: 36.5306, lng: 136.6214, address: '郷土資料館：野々市市本町3丁目19番24号', description: '野々市市の歴史や文化財を学べる施設です。地域の歴史資料や出土品などを見ることができます。' },
+      { id: 6, name: '高尾城跡', code: 'togashi6', lat: 36.51426, lng: 136.63665, address: '石川県金沢市高尾町', description: '富樫氏の詰城とされる山城跡です。富樫政親が一向一揆との戦いの際に立て籠もった場所として知られています。' },
+      { id: 7, name: '伝燈寺', code: 'togashi7', lat: 36.56752, lng: 136.71550, address: '石川県金沢市伝燈寺町付近', description: '富樫氏と関わりのある寺院です。富樫氏ゆかりの歴史を伝える場所の一つです。' },
+      { id: 8, name: '御廟谷', code: 'togashi8', lat: 36.50456, lng: 136.62800, address: '石川県金沢市額谷町付近', description: '富樫氏の墓所と伝えられる場所です。富樫氏の歴史を知ることができる場所の一つです。' }
     ];
 
+    // カメラ・地図関連
     let scanner = null;
     let cameraRunning = false;
     let currentCamera = 'environment';
     let cameraBusy = false;
     let scanProcessing = false;
-    let exchangeHistory = JSON.parse(localStorage.getItem('exchangeHistory') || '[]');
     let map = null;
     let userMarker = null;
     let mapMarkers = [];
 
-    const spotsData = [
-      {
-        id: 1,
-        name: '富樫館跡',
-        lat: 36.5331, // 布市神社境内・富樫氏先業碑（ピン3のすぐ隣）
-        lng: 136.6188,
-        address: '野々市市本町2丁目付近（布市神社境内）',
-        description: '富樫氏歴代の居館跡と伝えられる場所です。布市神社境内に石碑が建てられています。'
-      },
-      {
-        id: 2,
-        name: '守護所・富樫館跡',
-        lat: 36.5285, // 住吉情報児童公園（住吉町235-2）
-        lng: 136.6202,
-        address: '野々市市住吉町235番地2',
-        description: '1335年に加賀の守護となった富樫高家の館で、政務を行った守護所でもあります。発掘調査によって館を囲む堀の一部が確認されています。'
-      },
-      {
-        id: 3,
-        name: '布市神社',
-        lat: 36.5334, // 布市神社 社殿・大杉
-        lng: 136.6184,
-        address: '野々市市本町2丁目14-16',
-        description: '富樫氏と関わりのある神社です。富樫氏ゆかりの場所として知られています。'
-      },
-      {
-        id: 4,
-        name: '大乗寺跡',
-        lat: 36.5362, // 旧北国街道沿い・大乗寺旧跡碑（高安軒）
-        lng: 136.6136,
-        address: '野々市市本町1丁目付近',
-        description: '富樫氏と深い関係を持った大乗寺の旧跡です。大乗寺は野々市で発展した後、各地を経て現在の金沢市へ移りました。'
-      },
-      {
-        id: 5,
-        name: '野々市市郷土資料館・ふるさと歴史館',
-        lat: 36.5306, // 郷土資料館（あらみや・旧魚住家住宅）
-        lng: 136.6214,
-        address: '郷土資料館：野々市市本町3丁目19番24号',
-        description: '野々市市の歴史や文化財を学べる施設です。地域の歴史資料や出土品などを見ることができます。'
-      },
-      {
-        id: 6,
-        name: '高尾城跡',
-        lat: 36.51426, // 高尾山山頂・本丸跡見晴台
-        lng: 136.63665,
-        address: '石川県金沢市高尾町',
-        description: '富樫氏の詰城とされる山城跡です。富樫政親が一向一揆との戦いの際に立て籠もった場所として知られています。'
-      },
-      {
-        id: 7,
-        name: '伝燈寺',
-        lat: 36.56752, // 伝燈寺本堂付近
-        lng: 136.71550,
-        address: '石川県金沢市伝燈寺町付近',
-        description: '富樫氏と関わりのある寺院です。富樫氏ゆかりの歴史を伝える場所の一つです。'
-      },
-      {
-        id: 8,
-        name: '御廟谷',
-        lat: 36.50456, // 額谷町・富樫家墓所
-        lng: 136.62800,
-        address: '石川県金沢市額谷町付近',
-        description: '富樫氏の墓所と伝えられる場所です。富樫氏の歴史を知ることができる場所の一つです。'
+    // ==================================================
+    // 2. ユーザーおよびデータベースの初期化
+    // ==================================================
+    async function initApp() {
+      // スポット一覧の取得
+      if (supabaseClient) {
+        const { data: dbSpots, error } = await supabaseClient
+          .from('spots')
+          .select('*')
+          .order('id', { ascending: true });
+        spotsData = (!error && dbSpots && dbSpots.length > 0) ? dbSpots : fallbackSpots;
+      } else {
+        spotsData = fallbackSpots;
       }
-    ];
+
+      // ユーザーの初期化
+      if (supabaseClient) {
+        if (!userId) {
+          const { data, error } = await supabaseClient
+            .from('users')
+            .insert([{ total_points: 0 }])
+            .select()
+            .single();
+
+          if (!error && data) {
+            userId = data.id;
+            localStorage.setItem('togashi_user_id', userId);
+            points = data.total_points;
+          }
+        } else {
+          // 既存ユーザーのポイントと履歴を取得
+          const { data: userData } = await supabaseClient
+            .from('users')
+            .select('total_points')
+            .eq('id', userId)
+            .single();
+
+          if (userData) {
+            points = userData.total_points;
+          }
+
+          // スキャン履歴取得
+          const { data: stampLogs } = await supabaseClient
+            .from('stamp_logs')
+            .select('spot_id, spots(code)')
+            .eq('user_id', userId);
+
+          if (stampLogs) {
+            scannedCodes = new Set(stampLogs.map(log => log.spots?.code || `togashi${log.spot_id}`));
+          }
+
+          // 交換履歴取得
+          const { data: exLogs } = await supabaseClient
+            .from('exchange_logs')
+            .select('*')
+            .eq('user_id', userId)
+            .order('exchanged_at', { ascending: false });
+
+          if (exLogs) {
+            exchangeHistory = exLogs.map(item => ({
+              name: item.reward_name,
+              points: item.points_spent,
+              date: new Date(item.exchanged_at).toLocaleString('ja-JP')
+            }));
+          }
+        }
+      } else {
+        // Supabase未設定時のローカルフォールバック
+        points = Number(localStorage.getItem('points')) || 0;
+        scannedCodes = new Set(JSON.parse(localStorage.getItem('scannedCodes') || '[]'));
+        exchangeHistory = JSON.parse(localStorage.getItem('exchangeHistory') || '[]');
+      }
+
+      updatePoints();
+      updateHistory();
+    }
 
     function updatePoints() {
       document.getElementById('homePoints').textContent = points;
@@ -894,8 +916,7 @@
       document.getElementById('totalPoints').textContent = points;
       document.getElementById('rewardPoints').textContent = points;
 
-      // 巡回プログレスバーの更新
-      const totalCount = spotsData.length;
+      const totalCount = spotsData.length || 8;
       const visitedCount = scannedCodes.size;
       const percentage = Math.round((visitedCount / totalCount) * 100);
 
@@ -912,37 +933,21 @@
         fillEl.classList.remove('completed');
       }
 
-      // スポット一覧の表示更新
       updateSpotListUI();
     }
 
     function showScreen(screenName) {
-      const screens = document.querySelectorAll('.screen');
-      screens.forEach(screen => screen.classList.remove('active'));
-
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       const target = document.getElementById(screenName);
       if (!target) return;
       target.classList.add('active');
 
-      const navButtons = document.querySelectorAll('nav button');
-      navButtons.forEach(button => button.classList.remove('selected'));
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('selected'));
+      const navMap = { home: 'navHome', scan: 'navScan', mapScreen: 'navMap', points: 'navPoints', rewards: 'navRewards' };
+      const selectedBtn = document.getElementById(navMap[screenName]);
+      if (selectedBtn) selectedBtn.classList.add('selected');
 
-      const navMap = {
-        home: 'navHome',
-        scan: 'navScan',
-        mapScreen: 'navMap',
-        points: 'navPoints',
-        rewards: 'navRewards'
-      };
-
-      const selectedButton = document.getElementById(navMap[screenName]);
-      if (selectedButton) {
-        selectedButton.classList.add('selected');
-      }
-
-      if (screenName !== 'scan' && cameraRunning) {
-        stopCamera();
-      }
+      if (screenName !== 'scan' && cameraRunning) stopCamera();
 
       if (screenName === 'mapScreen') {
         setTimeout(() => {
@@ -953,7 +958,6 @@
           }
         }, 120);
       }
-
       updatePoints();
     }
 
@@ -964,19 +968,14 @@
     document.getElementById('navPoints').addEventListener('click', () => showScreen('points'));
     document.getElementById('navRewards').addEventListener('click', () => showScreen('rewards'));
 
-    // ホーム内リンク
     document.getElementById('homeScanButton').addEventListener('click', () => showScreen('scan'));
     document.getElementById('homeMapButton').addEventListener('click', () => showScreen('mapScreen'));
     document.getElementById('homeRewardsButton').addEventListener('click', () => showScreen('rewards'));
-    document.getElementById('togashiSiteButton').addEventListener('click', () => {
-      window.open('https://www.city.nonoichi.lg.jp/', '_blank');
-    });
-
-    // ポイント内リンク
+    document.getElementById('togashiSiteButton').addEventListener('click', () => window.open('https://www.city.nonoichi.lg.jp/', '_blank'));
     document.getElementById('pointsScanButton').addEventListener('click', () => showScreen('scan'));
     document.getElementById('pointsRewardButton').addEventListener('click', () => showScreen('rewards'));
 
-    // モーダル表示
+    // モーダル
     function openPointModal(spotName, earnedPoints, totalPoints) {
       document.getElementById('modalSpotName').textContent = spotName;
       document.getElementById('modalEarnedPoints').textContent = `+${earnedPoints}`;
@@ -987,18 +986,16 @@
     function closePointModal() {
       document.getElementById('pointModal').classList.remove('active');
     }
-
     document.getElementById('modalCloseBtn').addEventListener('click', closePointModal);
     document.getElementById('pointModal').addEventListener('click', (e) => {
-      if (e.target === document.getElementById('pointModal')) {
-        closePointModal();
-      }
+      if (e.target === document.getElementById('pointModal')) closePointModal();
     });
 
-    // カメラ
+    // ==================================================
+    // 3. カメラ & QRスキャン（Supabase RPC呼び出し）
+    // ==================================================
     async function startCamera() {
       if (cameraBusy || cameraRunning) return;
-
       if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
         document.getElementById('cameraMessage').textContent = 'カメラを使用するにはHTTPS環境で開いてください。[cite: 1]';
         return;
@@ -1008,7 +1005,7 @@
         return;
       }
       if (typeof Html5Qrcode === 'undefined') {
-        document.getElementById('cameraMessage').textContent = 'ライブラリの読み込みに失敗しました。通信環境を確認してください。[cite: 1]';
+        document.getElementById('cameraMessage').textContent = 'ライブラリの読み込みに失敗しました。[cite: 1]';
         return;
       }
 
@@ -1017,9 +1014,7 @@
       document.getElementById('cameraMessage').textContent = 'カメラを起動しています...[cite: 1]';
 
       try {
-        if (!scanner) {
-          scanner = new Html5Qrcode('reader');
-        }
+        if (!scanner) scanner = new Html5Qrcode('reader');
         await scanner.start(
           { facingMode: currentCamera },
           { fps: 10, qrbox: { width: 220, height: 220 } },
@@ -1032,7 +1027,7 @@
           currentCamera === 'environment' ? '外カメラで読み取り中です。[cite: 1]' : '内カメラで読み取り中です。[cite: 1]';
       } catch (error) {
         console.error(error);
-        document.getElementById('cameraMessage').textContent = 'カメラを起動できません。設定から許可を確認してください。[cite: 1]';
+        document.getElementById('cameraMessage').textContent = 'カメラを起動できません。[cite: 1]';
       }
       cameraBusy = false;
       document.getElementById('startBtn').disabled = cameraRunning;
@@ -1042,14 +1037,11 @@
       if (!scanner || !cameraRunning || cameraBusy) return;
       cameraBusy = true;
       document.getElementById('stopBtn').disabled = true;
-
       try {
         await scanner.stop();
         cameraRunning = false;
         document.getElementById('cameraMessage').textContent = 'カメラは停止中です。[cite: 1]';
-      } catch (error) {
-        console.error(error);
-      }
+      } catch (e) { console.error(e); }
       cameraBusy = false;
       document.getElementById('startBtn').disabled = cameraRunning;
       document.getElementById('stopBtn').disabled = cameraRunning;
@@ -1059,13 +1051,9 @@
       if (cameraBusy) return;
       const wasRunning = cameraRunning;
       if (wasRunning) await stopCamera();
-
       currentCamera = mode;
       document.getElementById('backCameraBtn').disabled = (mode === 'environment');
       document.getElementById('frontCameraBtn').disabled = (mode === 'user');
-      document.getElementById('cameraMessage').textContent =
-        mode === 'environment' ? '外カメラを選択しました。[cite: 1]' : '内カメラを選択しました。[cite: 1]';
-
       if (wasRunning) await startCamera();
     }
 
@@ -1074,81 +1062,105 @@
     document.getElementById('backCameraBtn').addEventListener('click', () => changeCamera('environment'));
     document.getElementById('frontCameraBtn').addEventListener('click', () => changeCamera('user'));
 
-    function onScanSuccess(decodedText) {
+    // スキャン成功時（サーバー検証）
+    async function onScanSuccess(decodedText) {
       if (scanProcessing) return;
       scanProcessing = true;
-
       const code = decodedText.trim();
 
-      if (!validCodes.includes(code)) {
-        document.getElementById('cameraMessage').textContent = 'その二次元バーコードは使用できません。[cite: 1]';
-        scanProcessing = false;
-        return;
+      if (navigator.vibrate) navigator.vibrate([100, 50, 150]);
+
+      if (supabaseClient && userId) {
+        // Supabase の RPC 関数を呼び出して安全に検証・加算
+        const { data, error } = await supabaseClient.rpc('scan_qr_code', {
+          p_user_id: userId,
+          p_code: code
+        });
+
+        if (error || !data.success) {
+          document.getElementById('cameraMessage').textContent = data?.message || '通信エラーが発生しました。';
+          scanProcessing = false;
+          return;
+        }
+
+        points = data.total_points;
+        scannedCodes.add(code);
+        updatePoints();
+        openPointModal(data.spot_name, data.earned_points, points);
+        document.getElementById('cameraMessage').textContent = `${data.spot_name} で +${data.earned_points}pt 獲得！`;
+      } else {
+        // フォールバック（ローカル）
+        if (scannedCodes.has(code)) {
+          document.getElementById('cameraMessage').textContent = 'そのコードは既に使用済みです。[cite: 1]';
+          scanProcessing = false;
+          return;
+        }
+        scannedCodes.add(code);
+        const earned = Math.floor(Math.random() * 3) + 3;
+        points += earned;
+        localStorage.setItem('points', points);
+        localStorage.setItem('scannedCodes', JSON.stringify([...scannedCodes]));
+        updatePoints();
+        const spot = spotsData.find(s => s.code === code);
+        openPointModal(spot ? spot.name : code, earned, points);
       }
 
-      if (scannedCodes.has(code)) {
-        document.getElementById('cameraMessage').textContent = 'その二次元バーコードは既に使用済みです。[cite: 1]';
-        scanProcessing = false;
-        return;
-      }
-
-      // 触覚フィードバック（バイブレーション: 短く2回）
-      if (navigator.vibrate) {
-        navigator.vibrate([100, 50, 150]);
-      }
-
-      scannedCodes.add(code);
-      const earnedPoints = Math.floor(Math.random() * 3) + 3;
-      points += earnedPoints;
-
-      localStorage.setItem('points', points);
-      localStorage.setItem('scannedCodes', JSON.stringify([...scannedCodes]));
-
-      updatePoints();
-      document.getElementById('cameraMessage').textContent = `${code} を認識しました。${earnedPoints}pt 獲得！`;
-
-      const spotId = parseInt(code.replace('togashi', ''), 10);
-      const spot = spotsData.find(s => s.id === spotId);
-      const spotName = spot ? spot.name : code;
-
-      openPointModal(spotName, earnedPoints, points);
-
-      if (map) {
-        refreshMapPins();
-      }
-
-      setTimeout(() => {
-        scanProcessing = false;
-      }, 1000);
+      if (map) refreshMapPins();
+      setTimeout(() => { scanProcessing = false; }, 1500);
     }
 
-    // 景品交換
-    function exchangeReward(rewardName, requiredPoints) {
+    // ==================================================
+    // 4. 景品交換（Supabase RPC呼び出し）
+    // ==================================================
+    async function exchangeReward(rewardName, requiredPoints) {
       const message = document.getElementById('exchangeMessage');
-      if (points < requiredPoints) {
-        message.textContent = 'ポイントが不足しています。';
-        return;
+
+      if (supabaseClient && userId) {
+        const { data, error } = await supabaseClient.rpc('exchange_reward', {
+          p_user_id: userId,
+          p_reward_name: rewardName,
+          p_required_points: requiredPoints
+        });
+
+        if (error || !data.success) {
+          message.textContent = data?.message || '交換処理に失敗しました。';
+          return;
+        }
+
+        if (navigator.vibrate) navigator.vibrate(120);
+        points = data.total_points;
+        updatePoints();
+
+        // 履歴を再読み込み
+        const { data: exLogs } = await supabaseClient
+          .from('exchange_logs')
+          .select('*')
+          .eq('user_id', userId)
+          .order('exchanged_at', { ascending: false });
+
+        if (exLogs) {
+          exchangeHistory = exLogs.map(item => ({
+            name: item.reward_name,
+            points: item.points_spent,
+            date: new Date(item.exchanged_at).toLocaleString('ja-JP')
+          }));
+        }
+        updateHistory();
+        message.textContent = data.message;
+      } else {
+        // ローカルフォールバック
+        if (points < requiredPoints) {
+          message.textContent = 'ポイントが不足しています。';
+          return;
+        }
+        points -= requiredPoints;
+        exchangeHistory.push({ name: rewardName, points: requiredPoints, date: new Date().toLocaleString('ja-JP') });
+        localStorage.setItem('points', points);
+        localStorage.setItem('exchangeHistory', JSON.stringify(exchangeHistory));
+        updatePoints();
+        updateHistory();
+        message.textContent = `${rewardName} と交換しました。`;
       }
-
-      // 交換成功時にも短いバイブレーション
-      if (navigator.vibrate) {
-        navigator.vibrate(120);
-      }
-
-      points -= requiredPoints;
-      const history = {
-        name: rewardName,
-        points: requiredPoints,
-        date: new Date().toLocaleString('ja-JP')
-      };
-      exchangeHistory.push(history);
-
-      localStorage.setItem('points', points);
-      localStorage.setItem('exchangeHistory', JSON.stringify(exchangeHistory));
-
-      updatePoints();
-      updateHistory();
-      message.textContent = `${rewardName} と交換が完了しました。`;
     }
 
     document.getElementById('reward20Button').addEventListener('click', () => exchangeReward('協力店で使用できる商品券', 20));
@@ -1158,30 +1170,29 @@
     function updateHistory() {
       const list = document.getElementById('historyList');
       list.innerHTML = '';
-
       if (exchangeHistory.length === 0) {
         const li = document.createElement('li');
         li.textContent = '交換履歴はまだありません。[cite: 1]';
         list.appendChild(li);
         return;
       }
-
-      for (let i = exchangeHistory.length - 1; i >= 0; i--) {
-        const item = exchangeHistory[i];
+      exchangeHistory.forEach(item => {
         const li = document.createElement('li');
         li.textContent = `${item.date} : ${item.name} (${item.points}pt)`;
         list.appendChild(li);
-      }
+      });
     }
 
-    // スポット一覧リストUIの更新
+    // ==================================================
+    // 5. 地図 & スポットUI
+    // ==================================================
     function updateSpotListUI() {
       const container = document.getElementById('spotListContainer');
       if (!container) return;
       container.innerHTML = '';
 
       spotsData.forEach(spot => {
-        const isVisited = scannedCodes.has(`togashi${spot.id}`);
+        const isVisited = scannedCodes.has(spot.code || `togashi${spot.id}`);
         const item = document.createElement('div');
         item.className = `spot-item ${isVisited ? 'visited' : ''}`;
         item.innerHTML = `
@@ -1194,7 +1205,6 @@
       });
     }
 
-    // 地図機能
     function createPinIcon(spotId, isVisited) {
       const pinClass = isVisited ? 'map-pin visited' : 'map-pin unvisited';
       const label = isVisited ? '✓' : spotId;
@@ -1209,11 +1219,9 @@
 
     function refreshMapPins() {
       if (!map) return;
-
       mapMarkers.forEach(({ marker, spot }) => {
-        const isVisited = scannedCodes.has(`togashi${spot.id}`);
+        const isVisited = scannedCodes.has(spot.code || `togashi${spot.id}`);
         marker.setIcon(createPinIcon(spot.id, isVisited));
-
         const popupContent = `
           <div style="min-width: 200px;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
@@ -1232,41 +1240,34 @@
 
     function initializeMap() {
       if (map) return;
-      if (typeof L === 'undefined') {
-        document.getElementById('locationMessage').textContent = '地図機能を読み込めません。ネットワークを確認してください。[cite: 1]';
-        return;
-      }
+      if (typeof L === 'undefined') return;
 
-      map = L.map('map').setView([36.535, 136.645], 12);
+      map = L.map('map').setView([36.533, 136.620], 13);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
       }).addTo(map);
 
       mapMarkers = [];
-
       spotsData.forEach(spot => {
-        const isVisited = scannedCodes.has(`togashi${spot.id}`);
-        const icon = createPinIcon(spot.id, isVisited);
-
-        const marker = L.marker([spot.lat, spot.lng], { icon: icon }).addTo(map);
+        const isVisited = scannedCodes.has(spot.code || `togashi${spot.id}`);
+        const marker = L.marker([spot.lat, spot.lng], { icon: createPinIcon(spot.id, isVisited) }).addTo(map);
         marker.bindPopup('');
         mapMarkers.push({ marker, spot });
       });
 
       refreshMapPins();
 
-      const spotBounds = spotsData.map(spot => [spot.lat, spot.lng]);
-      map.fitBounds(spotBounds, { padding: [30, 30] });
+      if (spotsData.length > 0) {
+        const bounds = spotsData.map(s => [s.lat, s.lng]);
+        map.fitBounds(bounds, { padding: [30, 30] });
+      }
 
       getUserLocation();
     }
 
     function getUserLocation() {
       const message = document.getElementById('locationMessage');
-      if (!navigator.geolocation) {
-        message.textContent = 'お使いの環境は位置情報に対応していません。';
-        return;
-      }
+      if (!navigator.geolocation) return;
       message.textContent = '現在地を取得中...';
 
       navigator.geolocation.getCurrentPosition(
@@ -1296,38 +1297,31 @@
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     }
-
     document.getElementById('locationButton').addEventListener('click', getUserLocation);
 
     // リセット
-    document.getElementById('resetButton').addEventListener('click', () => {
-      const result = confirm('ポイント、読み取り履歴、景品交換履歴をすべて初期化します。よろしいですか？');
+    document.getElementById('resetButton').addEventListener('click', async () => {
+      const result = confirm('データを初期化します。よろしいですか？');
       if (!result) return;
 
-      points = 0;
-      scannedCodes.clear();
-      exchangeHistory = [];
-
+      localStorage.removeItem('togashi_user_id');
       localStorage.removeItem('points');
       localStorage.removeItem('scannedCodes');
       localStorage.removeItem('exchangeHistory');
 
-      updatePoints();
-      updateHistory();
+      userId = null;
+      points = 0;
+      scannedCodes.clear();
+      exchangeHistory = [];
 
-      if (map) {
-        refreshMapPins();
-      }
-
-      document.getElementById('exchangeMessage').textContent = '';
-      document.getElementById('cameraMessage').textContent = 'データを初期化しました。';
+      await initApp();
+      if (map) refreshMapPins();
       alert('データを初期化しました。');
     });
 
-    // 初期化
-    updatePoints();
-    updateHistory();
+    // 初期化実行
     document.getElementById('backCameraBtn').disabled = true;
+    initApp();
     showScreen('home');
   </script>
 </body>
